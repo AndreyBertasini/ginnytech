@@ -3,7 +3,6 @@
 // Runtime types generated with workerd@1.20260128.0 2025-08-15 global_fetch_strictly_public,nodejs_compat
 declare namespace Cloudflare {
   interface Env {
-    R2: R2Bucket
     D1: D1Database
     ASSETS: Fetcher
   }
