@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    lezioni: Lezione;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +79,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    lezioni: LezioniSelect<false> | LezioniSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -158,6 +160,59 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lezioni".
+ */
+export interface Lezione {
+  id: number;
+  titolo: string;
+  slug: string;
+  descrizione?: string | null;
+  contenuto?: {
+    [k: string]: unknown;
+  } | null;
+  categoria?: ('python' | 'sql' | 'analisi-dati' | 'machine-learning' | 'data-engineering' | 'visualizzazione-dati' | 'business-intelligence' | 'excel') | null;
+  livello?: ('principiante' | 'intermedio' | 'avanzato') | null;
+  durata?: number | null;
+  ordine?: number | null;
+  immagineCopertura?: number | Media | null;
+  tags?: {
+    valore: string;
+    id?: string | null;
+  }[] | null;
+  lezionePrecedente?: number | Lezione | null;
+  lezioneSuccessiva?: number | Lezione | null;
+  dataPubblicazione?: string | null;
+  pubblicato?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lezioni_select".
+ */
+export interface LezioniSelect<T extends boolean = true> {
+  titolo?: T;
+  slug?: T;
+  descrizione?: T;
+  contenuto?: T;
+  categoria?: T;
+  livello?: T;
+  durata?: T;
+  ordine?: T;
+  immagineCopertura?: T;
+  tags?: T | {
+    valore?: T;
+    id?: T;
+  };
+  lezionePrecedente?: T;
+  lezioneSuccessiva?: T;
+  dataPubblicazione?: T;
+  pubblicato?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -187,6 +242,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'lezioni';
+        value: number | Lezione;
       } | null);
   globalSlug?: string | null;
   user: {
