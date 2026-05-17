@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const modules = [
+  { num: 1, title: 'Panoramica del Corso e Metodo di Studio per Data Work', desc: 'Trasforma il corso da catalogo a sistema cognitivo, con metodo di studio, memoria tecnica e piano di output professionali.', lessons: 8, image: 'panoramica.webp', planUrl: 'https://ginnytech.it/course/modulo-1' },
+  { num: 2, title: 'Data Collection & Tracking Systems', desc: 'Passa da tag e strumenti isolati a sistemi di misura affidabili, governati e osservabili.', lessons: 8, image: 'data-collection.webp', planUrl: 'https://ginnytech.it/course/modulo-2' },
+  { num: 3, title: 'Metriche, KPI Trees e Fondamenti Analitici', desc: 'Impara a leggere i numeri come sistemi, con KPI tree, unit economics, baseline corrette e lettura causale dei segnali.', lessons: 6, image: 'metriche-fondamenti.webp', planUrl: 'https://ginnytech.it/course/modulo-3' },
+  { num: 4, title: 'Gestione Data-Driven e Operating System Decisionale', desc: 'Porta i dati nel modo quotidiano di decidere con cadence, governance, decision memo e allineamento tra funzioni.', lessons: 9, image: 'gestione-data-driven.webp', planUrl: 'https://ginnytech.it/course/modulo-4' },
+  { num: 5, title: 'Product Analytics e Growth Diagnostics', desc: 'Leggi dove il prodotto crea valore, attrito o perdita con funnel, retention, activation e monetization analytics.', lessons: 11, image: 'analisi-prodotto.webp', planUrl: 'https://ginnytech.it/course/modulo-5' },
+  { num: 6, title: 'Marketing Analytics, Incrementality e Unit Economics', desc: 'Porta il marketing da reporting a disciplina quantitativa seria con incrementality, unit economics e review decisionali.', lessons: 22, image: 'analisi-marketing.webp', planUrl: 'https://ginnytech.it/course/modulo-6' },
+  { num: 7, title: 'Dashboard, Visualization e Decision Interface', desc: 'Costruisci dashboard che fanno decidere, con gerarchia visiva, semantic consistency, alerting e contesto operativo.', lessons: 8, image: 'dashboard-visualizzazione.webp', planUrl: 'https://ginnytech.it/course/modulo-7' },
+  { num: 8, title: 'Marketing Data Science, Forecasting e Decision Models', desc: 'Introduce modelli utili al business, distinguendo prediction, causation, scenario planning e model risk.', lessons: 19, image: 'marketing-data-science.webp', planUrl: 'https://ginnytech.it/course/modulo-8' },
+  { num: 9, title: 'Data Warehousing & Analytical Architecture', desc: 'Capisci davvero come si progetta un sistema analitico scalabile con grain corretto, storicizzazione e trade-off architetturali.', lessons: 7, image: 'data-warehousing.webp', planUrl: 'https://ginnytech.it/course/modulo-9' },
+  { num: 10, title: 'S3, Data Lake e Lakehouse Architecture', desc: 'Passa da bucket con file a un data lake leggibile, governato e compatibile con i moderni pattern lakehouse.', lessons: 12, image: 's3-data-lake.webp', planUrl: 'https://ginnytech.it/course/modulo-10' },
+  { num: 11, title: 'Kafka & Event Streaming Engineering', desc: 'Insegna la logica del dato come flusso, con schema contracts, stream processing e failure handling realistico.', lessons: 9, image: 'kafka-streaming.webp', planUrl: 'https://ginnytech.it/course/modulo-11' },
+  { num: 12, title: 'Real-Time Analytics & ClickHouse Systems', desc: 'Trasforma il realtime da slogan a sistema robusto con ingestion pattern, MergeTree thinking e cost control.', lessons: 9, image: 'real-time-clickhouse.webp', planUrl: 'https://ginnytech.it/course/modulo-12' },
+  { num: 13, title: 'Infrastructure & Ops for Data Systems', desc: 'Dai disciplina operativa da ingegneria seria a workload dati, deploy, osservabilità, security e incident response.', lessons: 7, image: 'infrastructure-ops.webp', planUrl: 'https://ginnytech.it/course/modulo-13' },
+  { num: 14, title: 'Advanced SQL for Analytical Systems', desc: 'Usa SQL come linguaggio di ragionamento, non solo di estrazione, con pattern per coorti, funnel, esperimenti e performance.', lessons: 14, image: 'advanced-sql.webp', planUrl: 'https://ginnytech.it/course/modulo-14' },
+  { num: 15, title: "Matematica per l'Analisi Dati", desc: 'Inserisce il rigore matematico che rende più leggibili modelli, inferenza, forecasting e regressioni applicate.', lessons: 10, image: 'matematica.webp', planUrl: 'https://ginnytech.it/course/modulo-15' },
+  { num: 16, title: 'Analytics Engineering con dbt e Semantic Layer', desc: 'Trasforma dati grezzi in modelli affidabili, riusabili e governati con layering, test, contracts e semantic layer.', lessons: 13, image: 'analytics-engineering.webp', planUrl: 'https://ginnytech.it/course/modulo-16' },
+  { num: 17, title: 'Significatività Statistica, A/B Testing e Experimentation Science', desc: 'Porta la sperimentazione a livello serio con design causale, power planning, variance reduction e governance.', lessons: 10, image: 'ab-testing.webp', planUrl: 'https://ginnytech.it/course/modulo-17' },
+  { num: 18, title: 'Direzioni in Analitica: Marketing, Prodotto, Finanza', desc: 'Collega i moduli tecnici ai ruoli veri, alle responsabilità economiche e alle scelte strategiche.', lessons: 14, image: 'direzioni-analitica.webp', planUrl: 'https://ginnytech.it/course/modulo-18' },
+  { num: 19, title: "Fondamenti Filosofici dell'Analisi dei Dati", desc: 'Dai profondità epistemologica, causale e critica al lavoro sui dati, collegando evidenza, modelli, rischio e responsabilità.', lessons: 20, image: 'fondamenti-filosofici.webp', planUrl: 'https://ginnytech.it/course/modulo-19' },
+];
+---
+
+<BaseLayout>
+  <section class="hero">
+    <h1>Trasforma i dati in decisioni</h1>
+    <p class="hero-sub">Il corso più completo in italiano su Data Engineering, Analytics e Marketing Data Science. Dalle basi ai sistemi in produzione.</p>
+    <div class="hero-cta">
+      <a href="https://ginnytech.it/course" class="btn btn-primary">Inizia a studiare ora</a>
+      <a href="#moduli" class="btn btn-ghost">Vedi i moduli ↓</a>
+    </div>
+  </section>
+
+  <section id="moduli" class="modules">
+    <h2>Cosa imparerai</h2>
+    <p class="section-sub">19 moduli, 200+ lezioni. Dalla teoria alla pratica.</p>
+    <div class="module-grid">
+      {modules.map((m) => (
+        <article class="module-card">
+          <img src={`/course-module-images/${m.image}`} alt={m.title} loading="lazy" width="400" height="250" />
+          <div class="module-info">
+            <span class="module-num">MODULO {m.num}</span>
+            <h3>{m.title}</h3>
+            <p>{m.desc}</p>
+            <div class="module-meta">
+              <span>{m.lessons} LEZIONI</span>
+              {m.planUrl ? <a href={m.planUrl} class="btn btn-sm">Piano delle Lezioni</a> : null}
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="cta-bottom">
+    <h2>Pronto a dare una svolta alla tua carriera nei dati?</h2>
+    <p>Unisciti agli studenti che stanno già trasformando il loro modo di lavorare con i dati.</p>
+    <a href="https://ginnytech.it/course" class="btn btn-primary btn-lg">Inizia ora</a>
+    <a href="https://tidycal.com/andrii-d/15-minute-meeting" class="btn btn-ghost btn-lg">Prenota una call</a>
+  </section>
+</BaseLayout>
