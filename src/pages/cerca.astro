@@ -1,13 +1,97 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const searchModules = [
+  { title: 'Panoramica del Corso e Metodo di Studio', slug: 'modulo-1' },
+  { title: 'Data Collection & Tracking Systems', slug: 'modulo-2' },
+  { title: 'Metriche, KPI Trees e Fondamenti Analitici', slug: 'modulo-3' },
+  { title: 'Gestione Data-Driven e Operating System Decisionale', slug: 'modulo-4' },
+  { title: 'Product Analytics e Growth Diagnostics', slug: 'modulo-5' },
+  { title: 'Marketing Analytics, Incrementality e Unit Economics', slug: 'modulo-6' },
+  { title: 'Dashboard, Visualization e Decision Interface', slug: 'modulo-7' },
+  { title: 'Marketing Data Science, Forecasting e Decision Models', slug: 'modulo-8' },
+  { title: 'Data Warehousing & Analytical Architecture', slug: 'modulo-9' },
+  { title: 'S3, Data Lake e Lakehouse Architecture', slug: 'modulo-10' },
+  { title: 'Kafka & Event Streaming Engineering', slug: 'modulo-11' },
+  { title: 'Real-Time Analytics & ClickHouse Systems', slug: 'modulo-12' },
+  { title: 'Infrastructure & Ops for Data Systems', slug: 'modulo-13' },
+  { title: 'Advanced SQL for Analytical Systems', slug: 'modulo-14' },
+  { title: "Matematica per l'Analisi Dati", slug: 'modulo-15' },
+  { title: 'Analytics Engineering con dbt e Semantic Layer', slug: 'modulo-16' },
+  { title: 'Significatività Statistica, A/B Testing e Experimentation Science', slug: 'modulo-17' },
+  { title: 'Direzioni in Analitica: Marketing, Prodotto, Finanza', slug: 'modulo-18' },
+  { title: "Fondamenti Filosofici dell'Analisi dei Dati", slug: 'modulo-19' },
+];
 ---
 
-<BaseLayout title="Cerca">
+<BaseLayout title="Cerca" description="Cerca contenuti nel corso e negli articoli di GinnyTech.">
   <section class="page-hero">
     <h1>Cerca</h1>
-    <p class="hero-sub">Trova contenuti nel corso e negli articoli.</p>
+    <p class="hero-sub">Trova moduli, lezioni e contenuti nel corso.</p>
   </section>
-  <section class="page-content">
-    <p>La ricerca è in fase di sviluppo. Nel frattempo, naviga tra i <a href="/#moduli">moduli del corso</a> o esplora gli <a href="/articoli">articoli</a>.</p>
+  <section class="page-content search-content">
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Cerca un modulo..." autocomplete="off" />
+    </div>
+    <div id="search-results" class="search-results">
+      {searchModules.map((m) => (
+        <a href={`https://ginnytech.it/course/${m.slug}`} class="search-result" data-title={m.title.toLowerCase()}>
+          <span class="sr-title">{m.title}</span>
+          <span class="sr-arrow">→</span>
+        </a>
+      ))}
+    </div>
+    <noscript>
+      <p>Abilita JavaScript per usare la ricerca. Nel frattempo, naviga tra i <a href="/#moduli">moduli del corso</a>.</p>
+    </noscript>
   </section>
 </BaseLayout>
+
+<script>
+  const input = document.getElementById('search-input');
+  const results = document.querySelectorAll('.search-result');
+  
+  if (input) {
+    input.focus();
+    input.addEventListener('input', () => {
+      const q = input.value.toLowerCase().trim();
+      results.forEach(r => {
+        const title = r.getAttribute('data-title') || '';
+        r.style.display = (!q || title.includes(q)) ? '' : 'none';
+      });
+    });
+  }
+</script>
+
+<style>
+  .search-box { margin-bottom: 2rem; }
+  .search-box input {
+    width: 100%;
+    padding: 0.85rem 1.25rem;
+    font-size: 1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-box input:focus { border-color: var(--color-primary); }
+  .search-box input::placeholder { color: var(--color-text-muted); }
+  .search-results { display: flex; flex-direction: column; gap: 0.75rem; }
+  .search-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.2s, transform 0.15s;
+    text-decoration: none;
+  }
+  .search-result:hover { border-color: var(--color-primary); transform: translateX(4px); }
+  .sr-title { font-weight: 500; color: var(--color-text); }
+  .sr-arrow { color: var(--color-primary); font-weight: 700; }
+</style>

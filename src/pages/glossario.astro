@@ -1,13 +1,52 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const glossaryTerms = [
+  { term: 'A/B Testing', definition: 'Metodo di confronto controllato tra due varianti per misurare quale performa meglio su una metrica specifica.' },
+  { term: 'Analytics Engineering', definition: 'Disciplina che trasforma dati grezzi in modelli affidabili, riusabili e governati con strumenti come dbt.' },
+  { term: 'Click-through Rate (CTR)', definition: 'Percentuale di utenti che cliccano su un link rispetto a quelli che lo visualizzano.' },
+  { term: 'Data Lake', definition: 'Archivio scalabile per dati grezzi in qualsiasi formato, tipicamente su object storage come S3.' },
+  { term: 'Data Warehouse', definition: 'Database analitico ottimizzato per query su grandi volumi storici, con schema predefinito.' },
+  { term: 'dbt (Data Build Tool)', definition: 'Framework open-source per analytics engineering — trasforma dati con SQL, test, documentazione e versioning.' },
+  { term: 'ETL / ELT', definition: 'Extract-Transform-Load (o Extract-Load-Transform): pattern di pipeline per muovere e trasformare dati tra sistemi.' },
+  { term: 'Funnel Analysis', definition: 'Analisi sequenziale dei passaggi che un utente compie, misurando i drop-off a ogni stadio.' },
+  { term: 'KPI (Key Performance Indicator)', definition: 'Metrica quantitativa che riflette il successo su un obiettivo strategico di business.' },
+  { term: 'KPI Tree', definition: 'Albero gerarchico che scomposta un KPI principale in sotto-metriche operative e misurabili.' },
+  { term: 'Lakehouse', definition: 'Architettura che combina la flessibilità di un data lake con la struttura e le performance di un warehouse.' },
+  { term: 'Retention', definition: 'Percentuale di utenti che continuano a usare un prodotto dopo il primo utilizzo, misurata a intervalli temporali.' },
+  { term: 'Semantic Layer', definition: 'Strato di astrazione che definisce metriche e dimensioni business in modo centralizzato per dashboard e SQL.' },
+  { term: 'Tracking Engineering', definition: 'Disciplina che progetta, implementa e governa la raccolta di dati event dal client al data platform.' },
+  { term: 'Unit Economics', definition: 'Analisi dei ricavi e costi per singola unità (es. per cliente, per ordine) per valutare sostenibilità di un modello.' },
+];
 ---
 
-<BaseLayout title="Glossario">
+<BaseLayout title="Glossario" description="Glossario dei principali termini di Data Engineering, Analytics e Marketing Data Science.">
   <section class="page-hero">
     <h1>Glossario</h1>
-    <p class="hero-sub">Termini tecnici del Data Engineering e Analytics spiegati in modo chiaro.</p>
+    <p class="hero-sub">{glossaryTerms.length} termini chiave del Data Engineering e Analytics, spiegati in modo chiaro e contestualizzato.</p>
   </section>
-  <section class="page-content">
-    <p>Il glossario è in fase di popolamento. Nel frattempo, esplora il <a href="https://ginnytech.it/course">corso</a> dove ogni termine tecnico viene introdotto con contesto pratico.</p>
+  <section class="page-content glossary-content">
+    <div class="glossary-list">
+      {glossaryTerms.map(({ term, definition }) => (
+        <div class="glossary-entry">
+          <dt><strong>{term}</strong></dt>
+          <dd>{definition}</dd>
+        </div>
+      ))}
+    </div>
+    <p class="glossary-more">Questo glossario si arricchisce con ogni modulo del <a href="https://ginnytech.it/course">corso</a>, dove ogni termine viene introdotto con contesto pratico e casi d'uso reali.</p>
   </section>
 </BaseLayout>
+
+<style>
+  .glossary-list { display: flex; flex-direction: column; gap: 1.25rem; }
+  .glossary-entry {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+  }
+  .glossary-entry dt { margin-bottom: 0.35rem; color: var(--color-text); }
+  .glossary-entry dd { color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.55; }
+  .glossary-more { margin-top: 2rem; color: var(--color-text-muted); font-size: 0.9rem; }
+</style>

@@ -1,13 +1,80 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const articles = [
+  {
+    title: 'Perché il tuo funnel è rotto (e non è colpa del traffico)',
+    excerpt: 'La maggior parte dei team incolpa il traffico quando le conversioni crollano. Ma il problema è quasi sempre downstream: activation, value moment, o trust gap.',
+    tag: 'Analytics',
+    date: 'In arrivo',
+  },
+  {
+    title: 'Da GA4 al data warehouse: la mappa mancante',
+    excerpt: 'Tutti parlano di "portare i dati in BigQuery", ma nessuno spiega cosa succede dopo. La vera domanda: che grain, che storicizzazione, che contract?',
+    tag: 'Data Engineering',
+    date: 'In arrivo',
+  },
+  {
+    title: 'Se il tuo KPI non cambia una decisione, non è un KPI',
+    excerpt: 'Metriche decorative ovunque. Come distinguere un indicatore che guida azione da uno che riempie slide.',
+    tag: 'Metriche',
+    date: 'In arrivo',
+  },
+  {
+    title: 'L\'errore che fa la differenza: pensare per incrementality',
+    excerpt: 'Il marketing spend non è investimenti — è un esperimento. Se non misuri il controfattuale, stai solo sperando.',
+    tag: 'Marketing Analytics',
+    date: 'In arrivo',
+  },
+];
 ---
 
-<BaseLayout title="Articoli">
+<BaseLayout title="Articoli" description="Guide, approfondimenti e riflessioni su Data Engineering, Analytics e Marketing Data Science.">
   <section class="page-hero">
     <h1>Articoli</h1>
-    <p class="hero-sub">Guide, approfondimenti e riflessioni su Data Engineering, Analytics e Marketing Data Science.</p>
+    <p class="hero-sub">Analisi spietate, guide operative e riflessioni che non trovi nei corsi generici.</p>
   </section>
-  <section class="page-content">
-    <p>La sezione articoli è in fase di sviluppo. Nel frattempo, puoi esplorare il <a href="https://ginnytech.it/course">corso completo</a> o leggere le ultime <a href="https://news.ginnytech.it">news su MarTech e Analytics</a>.</p>
+  <section class="page-content articles-content">
+    <div class="article-list">
+      {articles.map((a) => (
+        <article class="article-card">
+          <div class="article-tag">{a.tag}</div>
+          <h3>{a.title}</h3>
+          <p>{a.excerpt}</p>
+          <span class="article-date">{a.date}</span>
+        </article>
+      ))}
+    </div>
+    <div class="cta-box">
+      <p>Nel frattempo, il corso copre tutti questi argomenti con depth operativo.</p>
+      <a href="https://ginnytech.it/course" class="btn btn-primary">Esplora il corso</a>
+    </div>
   </section>
 </BaseLayout>
+
+<style>
+  .article-list { display: flex; flex-direction: column; gap: 1.25rem; }
+  .article-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    transition: border-color 0.2s;
+  }
+  .article-card:hover { border-color: var(--color-primary); }
+  .article-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    background: rgba(34,211,238,0.1);
+    border-radius: 4px;
+    padding: 0.2rem 0.6rem;
+    margin-bottom: 0.75rem;
+  }
+  .article-card h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
+  .article-card p { color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.55; }
+  .article-date { font-size: 0.78rem; color: var(--color-text-muted); margin-top: 0.75rem; display: block; }
+</style>

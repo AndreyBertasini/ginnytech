@@ -2,10 +2,12 @@
 export interface Props {
   title?: string;
   description?: string;
+  canonical?: string;
 }
-const { title, description } = Astro.props;
+const { title, description, canonical } = Astro.props;
 const pageTitle = title ? `${title} — GinnyTech` : 'GinnyTech — Corso Data Engineering & Analytics';
 const pageDesc = description || 'Il corso più completo in italiano su Data Engineering, Analytics e Marketing Data Science.';
+const canonicalURL = canonical || new URL(Astro.url.pathname, 'https://ginnytech.it').toString();
 ---
 
 <!DOCTYPE html>
@@ -16,15 +18,27 @@ const pageDesc = description || 'Il corso più completo in italiano su Data Engi
   <meta name="description" content={pageDesc} />
   <title>{pageTitle}</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="canonical" href={canonicalURL} />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={pageDesc} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:image" content="https://ginnytech.it/ginni.png" />
+  <meta property="og:locale" content="it_IT" />
+  <meta property="og:site_name" content="GinnyTech" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={pageTitle} />
+  <meta name="twitter:description" content={pageDesc} />
+  <meta name="twitter:image" content="https://ginnytech.it/ginni.png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles/global.css" />
-  <meta property="og:title" content={pageTitle} />
-  <meta property="og:description" content={pageDesc} />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://ginnytech.it/ginni.png" />
-  <meta name="twitter:card" content="summary_large_image" />
 </head>
 <body>
   <header class="site-header">
@@ -35,7 +49,10 @@ const pageDesc = description || 'Il corso più completo in italiano su Data Engi
         </svg>
         GinnyTech
       </a>
-      <nav class="site-nav" aria-label="Navigazione principale">
+      <button class="hamburger" id="menu-toggle" aria-label="Apri menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Navigazione principale">
         <a href="/" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}>Home</a>
         <a href="/chi-sono">Chi sono</a>
         <a href="https://ginnytech.it/course">Corso</a>
@@ -82,6 +99,7 @@ const pageDesc = description || 'Il corso più completo in italiano su Data Engi
         <ul>
           <li><a href="https://ginnytech.it/course">Corso</a></li>
           <li><a href="/articoli">Articoli</a></li>
+          <li><a href="/glossario">Glossario</a></li>
         </ul>
       </div>
 
@@ -89,7 +107,7 @@ const pageDesc = description || 'Il corso più completo in italiano su Data Engi
         <h4>Risorse</h4>
         <ul>
           <li><a href="/informazioni">Informazioni</a></li>
-          <li><a href="/glossario">Glossario</a></li>
+          <li><a href="/cerca">Cerca</a></li>
         </ul>
       </div>
 
@@ -109,3 +127,23 @@ const pageDesc = description || 'Il corso più completo in italiano su Data Engi
   </footer>
 </body>
 </html>
+
+<script>
+  const toggle = document.getElementById('menu-toggle');
+  const nav = document.getElementById('site-nav');
+  if (toggle && nav) {
+    toggle.addEventListener('click', () => {
+      const open = nav.classList.toggle('nav-open');
+      toggle.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+    // Close menu when clicking a link
+    nav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        nav.classList.remove('nav-open');
+        toggle.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+</script>
