@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
-    "astro": "^5.18.1",
-    "shiki": "^4.0.2"
+    "astro": "^7.0.2",
+    "shiki": "^4.2.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250303.0",
