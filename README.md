@@ -51,7 +51,9 @@ TypeScript resta nella versione 6: al momento `astro check` richiede l’API pro
 
 ## Build e Cloudflare Pages
 
-`npm run build` produce direttamente `.open-next/assets`, il percorso già usato per Cloudflare Pages. Il build non riscrive file tracciati in `dist/`. Per esaminare l’output usa `npm run preview`.
+`npm run build` produce direttamente `.open-next/assets`. `wrangler.jsonc` dichiara lo stesso percorso in `pages_build_output_dir`, così Pages usa gli asset generati e non un eventuale valore precedente nel pannello. Gli output generati non sono tracciati nel repository. Per esaminare il build usa `npm run preview`.
+
+Per la pubblicazione automatica, il progetto Cloudflare Pages deve essere collegato a questo repository con ramo di produzione `main` e comando di build `npm run build`. Controlla nel pannello che il deployment di produzione corrisponda all’ultimo commit: la presenza del codice su GitHub non prova l’esito del deployment. La cartella di output corretta è `.open-next/assets`, mai una copia storica di `dist/`.
 
 `npm run deploy` compila e invia gli asset al progetto Cloudflare Pages `ginnytech`; richiede autenticazione Cloudflare ed è separato dalla pubblicazione Git su `main`. Un push non dimostra da solo il completamento del deployment: verificare l’esito nel progetto Cloudflare.
 
