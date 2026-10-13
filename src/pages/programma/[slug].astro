@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { modules, stages, type CourseModule } from '../../data/course';
+
+export function getStaticPaths() {
+  return modules.map(module => ({ params: { slug: module.slug }, props: { module } }));
+}
+
+interface Props { module: CourseModule; }
+const { module } = Astro.props;
+const stage = stages.find(s => s.moduleIds.includes(module.id))!;
+const position = stage.moduleIds.indexOf(module.id);
+const next = modules.find(m => m.id === stage.moduleIds[position + 1]);
+const prerequisites = module.prerequisiteIds.map(id => modules.find(m => m.id === id)!);
+---
+
+<BaseLayout title={module.title} description={module.summary}>
+  <section class="page-hero">
+    <p class="eyebrow">Modulo {module.id} · {stage.title}</p>
+    <h1>{module.title}</h1>
+    <p class="hero-sub">{module.summary}</p>
+    <a href={`https://ginnytech.it/course/${module.slug}`} class="btn btn-primary">Apri il modulo nel corso gratuito</a>
+  </section>
+
+  <article class="page-content module-detail">
+    <nav class="breadcrumbs" aria-label="Percorso della pagina">
+      <a href="/programma/">Programma</a><span aria-hidden="true"> / </span><a href={`/programma/#${stage.id}`}>{stage.title}</a>
+    </nav>
+    <h2>Prima di iniziare</h2>
+    <p>{module.priorKnowledge}</p>
+    {prerequisites.length > 0 && (
+      <>
+        <p>Prima di proseguire, ripassa questi argomenti:</p>
+        <ul>{prerequisites.map(m => <li><a href={`/programma/${m.slug}/`}>{m.title}</a></li>)}</ul>
+      </>
+    )}
+    <h2>Obiettivi del modulo</h2>
+    <ul>{module.outcomes.map(outcome => <li>{outcome}</li>)}</ul>
+    <h2>Argomenti da affrontare</h2>
+    <ul>{module.topics.map(topic => <li>{topic}</li>)}</ul>
+    <section class="practice-box" aria-labelledby="pratica">
+      <h2 id="pratica">Metti in pratica</h2>
+      <p>Una proposta per esercitarti mentre studi: {module.practice.brief}</p>
+      <h3>Il risultato da preparare</h3>
+      <p>{module.practice.deliverable}</p>
+      <h3>Come controllare il tuo lavoro</h3>
+      <ul>{module.practice.criteria.map(criterion => <li>{criterion}</li>)}</ul>
+    </section>
+    <h2>Come proseguire</h2>
+    {next ? (
+      <p>Il prossimo argomento di questa tappa è <a href={`/programma/${next.slug}/`}>{next.title}</a>. Controlla i prerequisiti prima di iniziare.</p>
+    ) : (
+      <p>Hai completato gli argomenti di questa tappa? <a href="/programma/#percorsi">Torna ai percorsi</a> per scegliere il prossimo approfondimento.</p>
+    )}
+    <p>Se incontri un termine nuovo, consulta il <a href="/glossario/">glossario</a>.</p>
+    <div class="cta-box"><a href={`/programma/#${stage.id}`} class="btn btn-ghost">Torna alla tappa</a></div>
+  </article>
+</BaseLayout>

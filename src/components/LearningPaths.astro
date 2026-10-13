@@ -1,0 +1,26 @@
+---
+import { learningPaths, modules } from '../data/course';
+interface Props { showModules?: boolean; }
+const { showModules = false } = Astro.props;
+---
+
+<div class="path-grid">
+  {learningPaths.map(path => (
+    <article class="path-card" id={`percorso-${path.id}`}>
+      <h3>{path.title}</h3>
+      <p>{path.audience}</p>
+      <p>{path.goal}</p>
+      {showModules ? (
+        <details>
+          <summary>Vedi l’ordine di studio consigliato</summary>
+          <ol class="path-modules">
+            {path.moduleIds.map(id => {
+              const module = modules.find(m => m.id === id)!;
+              return <li><a href={`/programma/${module.slug}/`}>{module.title}</a></li>;
+            })}
+          </ol>
+        </details>
+      ) : <a href={`/programma/#percorso-${path.id}`} class="text-link">Esplora questo percorso →</a>}
+    </article>
+  ))}
+</div>

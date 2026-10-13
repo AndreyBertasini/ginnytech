@@ -1,0 +1,18 @@
+---
+import type { CourseModule } from '../data/course';
+interface Props { module: CourseModule; }
+const { module } = Astro.props;
+---
+
+<article class="module-card">
+  <div class="module-cover" aria-hidden="true">
+    <span class="module-cover-number">{String(module.id).padStart(2, '0')}</span>
+    <span>GinnyTech · Programma</span>
+  </div>
+  <div class="module-info">
+    <span class="module-num">MODULO {module.id}</span>
+    <h3>{module.title}</h3>
+    <p>{module.summary}</p>
+    <a href={`/programma/${module.slug}/`} class="btn btn-ghost btn-sm" aria-label={`Obiettivi e prerequisiti: ${module.title}`}>Obiettivi e prerequisiti →</a>
+  </div>
+</article>

@@ -1,80 +1,28 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-
-const articles = [
-  {
-    title: 'Perché il tuo funnel è rotto (e non è colpa del traffico)',
-    excerpt: 'La maggior parte dei team incolpa il traffico quando le conversioni crollano. Ma il problema è quasi sempre downstream: activation, value moment, o trust gap.',
-    tag: 'Analytics',
-    date: 'In arrivo',
-  },
-  {
-    title: 'Da GA4 al data warehouse: la mappa mancante',
-    excerpt: 'Tutti parlano di "portare i dati in BigQuery", ma nessuno spiega cosa succede dopo. La vera domanda: che grain, che storicizzazione, che contract?',
-    tag: 'Data Engineering',
-    date: 'In arrivo',
-  },
-  {
-    title: 'Se il tuo KPI non cambia una decisione, non è un KPI',
-    excerpt: 'Metriche decorative ovunque. Come distinguere un indicatore che guida azione da uno che riempie slide.',
-    tag: 'Metriche',
-    date: 'In arrivo',
-  },
-  {
-    title: 'L\'errore che fa la differenza: pensare per incrementality',
-    excerpt: 'Il marketing spend non è investimenti — è un esperimento. Se non misuri il controfattuale, stai solo sperando.',
-    tag: 'Marketing Analytics',
-    date: 'In arrivo',
-  },
+const previews = [
+  { title: 'Come trovare gli ostacoli in un funnel', description: 'Distingui problemi di acquisizione, attivazione e conversione analizzando i passaggi del percorso utente.', category: 'Analisi di prodotto', moduleId: 5 },
+  { title: 'Da GA4 al data warehouse', description: 'Le domande da affrontare prima di importare eventi: granularità, storico e regole di qualità.', category: 'Data engineering', moduleId: 9 },
+  { title: 'Collegare i KPI alle decisioni', description: 'Come scegliere indicatori associati a obiettivi, azioni e responsabilità.', category: 'Metriche', moduleId: 3 },
+  { title: 'Misurare l’effetto incrementale del marketing', description: 'Perché attribuire una conversione non basta a dimostrare che una campagna l’abbia causata.', category: 'Analisi di marketing', moduleId: 6 },
 ];
 ---
 
-<BaseLayout title="Articoli" description="Guide, approfondimenti e riflessioni su Data Engineering, Analytics e Marketing Data Science.">
-  <section class="page-hero">
-    <h1>Articoli</h1>
-    <p class="hero-sub">Analisi spietate, guide operative e riflessioni che non trovi nei corsi generici.</p>
-  </section>
+<BaseLayout title="Articoli e approfondimenti" description="Scopri i temi degli approfondimenti GinnyTech in preparazione e i moduli collegati su metriche, analytics e data engineering.">
+  <section class="page-hero"><h1>Articoli e approfondimenti</h1><p class="hero-sub">Idee e domande per collegare dati, strumenti e problemi di lavoro.</p></section>
   <section class="page-content articles-content">
+    <p class="notice">Gli articoli sono in preparazione.</p>
+    <p>I temi qui sotto sono anteprime, non articoli già pubblicati. Puoi intanto approfondire gli argomenti nei moduli collegati del corso gratuito.</p>
     <div class="article-list">
-      {articles.map((a) => (
+      {previews.map(article => (
         <article class="article-card">
-          <div class="article-tag">{a.tag}</div>
-          <h3>{a.title}</h3>
-          <p>{a.excerpt}</p>
-          <span class="article-date">{a.date}</span>
+          <span class="eyebrow">{article.category} · Anteprima</span>
+          <h2>{article.title}</h2>
+          <p>{article.description}</p>
+          <a href={`/programma/modulo-${article.moduleId}/`} class="text-link">Esplora il modulo collegato →</a>
         </article>
       ))}
     </div>
-    <div class="cta-box">
-      <p>Nel frattempo, il corso copre tutti questi argomenti con depth operativo.</p>
-      <a href="https://ginnytech.it/course" class="btn btn-primary">Esplora il corso</a>
-    </div>
+    <div class="cta-box"><p>Vuoi orientarti tra gli argomenti?</p><a href="/programma/" class="btn btn-primary">Consulta il programma</a></div>
   </section>
 </BaseLayout>
-
-<style>
-  .article-list { display: flex; flex-direction: column; gap: 1.25rem; }
-  .article-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    transition: border-color 0.2s;
-  }
-  .article-card:hover { border-color: var(--color-primary); }
-  .article-tag {
-    display: inline-block;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--color-accent);
-    background: rgba(34,211,238,0.1);
-    border-radius: 4px;
-    padding: 0.2rem 0.6rem;
-    margin-bottom: 0.75rem;
-  }
-  .article-card h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
-  .article-card p { color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.55; }
-  .article-date { font-size: 0.78rem; color: var(--color-text-muted); margin-top: 0.75rem; display: block; }
-</style>

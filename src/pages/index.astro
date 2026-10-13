@@ -1,64 +1,46 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-
-const modules = [
-  { num: 1, title: 'Panoramica del Corso e Metodo di Studio per Data Work', desc: 'Trasforma il corso da catalogo a sistema cognitivo, con metodo di studio, memoria tecnica e piano di output professionali.', lessons: 8, image: 'panoramica.webp', planUrl: 'https://ginnytech.it/course/modulo-1' },
-  { num: 2, title: 'Data Collection & Tracking Systems', desc: 'Passa da tag e strumenti isolati a sistemi di misura affidabili, governati e osservabili.', lessons: 8, image: 'data-collection.webp', planUrl: 'https://ginnytech.it/course/modulo-2' },
-  { num: 3, title: 'Metriche, KPI Trees e Fondamenti Analitici', desc: 'Impara a leggere i numeri come sistemi, con KPI tree, unit economics, baseline corrette e lettura causale dei segnali.', lessons: 6, image: 'metriche-fondamenti.webp', planUrl: 'https://ginnytech.it/course/modulo-3' },
-  { num: 4, title: 'Gestione Data-Driven e Operating System Decisionale', desc: 'Porta i dati nel modo quotidiano di decidere con cadence, governance, decision memo e allineamento tra funzioni.', lessons: 9, image: 'gestione-data-driven.webp', planUrl: 'https://ginnytech.it/course/modulo-4' },
-  { num: 5, title: 'Product Analytics e Growth Diagnostics', desc: 'Leggi dove il prodotto crea valore, attrito o perdita con funnel, retention, activation e monetization analytics.', lessons: 11, image: 'analisi-prodotto.webp', planUrl: 'https://ginnytech.it/course/modulo-5' },
-  { num: 6, title: 'Marketing Analytics, Incrementality e Unit Economics', desc: 'Porta il marketing da reporting a disciplina quantitativa seria con incrementality, unit economics e review decisionali.', lessons: 22, image: 'analisi-marketing.webp', planUrl: 'https://ginnytech.it/course/modulo-6' },
-  { num: 7, title: 'Dashboard, Visualization e Decision Interface', desc: 'Costruisci dashboard che fanno decidere, con gerarchia visiva, semantic consistency, alerting e contesto operativo.', lessons: 8, image: 'dashboard-visualizzazione.webp', planUrl: 'https://ginnytech.it/course/modulo-7' },
-  { num: 8, title: 'Marketing Data Science, Forecasting e Decision Models', desc: 'Introduce modelli utili al business, distinguendo prediction, causation, scenario planning e model risk.', lessons: 19, image: 'marketing-data-science.webp', planUrl: 'https://ginnytech.it/course/modulo-8' },
-  { num: 9, title: 'Data Warehousing & Analytical Architecture', desc: 'Capisci davvero come si progetta un sistema analitico scalabile con grain corretto, storicizzazione e trade-off architetturali.', lessons: 7, image: 'data-warehousing.webp', planUrl: 'https://ginnytech.it/course/modulo-9' },
-  { num: 10, title: 'S3, Data Lake e Lakehouse Architecture', desc: 'Passa da bucket con file a un data lake leggibile, governato e compatibile con i moderni pattern lakehouse.', lessons: 12, image: 's3-data-lake.webp', planUrl: 'https://ginnytech.it/course/modulo-10' },
-  { num: 11, title: 'Kafka & Event Streaming Engineering', desc: 'Insegna la logica del dato come flusso, con schema contracts, stream processing e failure handling realistico.', lessons: 9, image: 'kafka-streaming.webp', planUrl: 'https://ginnytech.it/course/modulo-11' },
-  { num: 12, title: 'Real-Time Analytics & ClickHouse Systems', desc: 'Trasforma il realtime da slogan a sistema robusto con ingestion pattern, MergeTree thinking e cost control.', lessons: 9, image: 'real-time-clickhouse.webp', planUrl: 'https://ginnytech.it/course/modulo-12' },
-  { num: 13, title: 'Infrastructure & Ops for Data Systems', desc: 'Dai disciplina operativa da ingegneria seria a workload dati, deploy, osservabilità, security e incident response.', lessons: 7, image: 'infrastructure-ops.webp', planUrl: 'https://ginnytech.it/course/modulo-13' },
-  { num: 14, title: 'Advanced SQL for Analytical Systems', desc: 'Usa SQL come linguaggio di ragionamento, non solo di estrazione, con pattern per coorti, funnel, esperimenti e performance.', lessons: 14, image: 'advanced-sql.webp', planUrl: 'https://ginnytech.it/course/modulo-14' },
-  { num: 15, title: "Matematica per l'Analisi Dati", desc: 'Inserisce il rigore matematico che rende più leggibili modelli, inferenza, forecasting e regressioni applicate.', lessons: 10, image: 'matematica.webp', planUrl: 'https://ginnytech.it/course/modulo-15' },
-  { num: 16, title: 'Analytics Engineering con dbt e Semantic Layer', desc: 'Trasforma dati grezzi in modelli affidabili, riusabili e governati con layering, test, contracts e semantic layer.', lessons: 13, image: 'analytics-engineering.webp', planUrl: 'https://ginnytech.it/course/modulo-16' },
-  { num: 17, title: 'Significatività Statistica, A/B Testing e Experimentation Science', desc: 'Porta la sperimentazione a livello serio con design causale, power planning, variance reduction e governance.', lessons: 10, image: 'ab-testing.webp', planUrl: 'https://ginnytech.it/course/modulo-17' },
-  { num: 18, title: 'Direzioni in Analitica: Marketing, Prodotto, Finanza', desc: 'Collega i moduli tecnici ai ruoli veri, alle responsabilità economiche e alle scelte strategiche.', lessons: 14, image: 'direzioni-analitica.webp', planUrl: 'https://ginnytech.it/course/modulo-18' },
-  { num: 19, title: "Fondamenti Filosofici dell'Analisi dei Dati", desc: 'Dai profondità epistemologica, causale e critica al lavoro sui dati, collegando evidenza, modelli, rischio e responsabilità.', lessons: 20, image: 'fondamenti-filosofici.webp', planUrl: 'https://ginnytech.it/course/modulo-19' },
-];
+import LearningPaths from '../components/LearningPaths.astro';
+import { modules } from '../data/course';
 ---
 
-<BaseLayout>
+<BaseLayout description="Un corso gratuito in italiano per collegare metriche, SQL, data engineering e analisi di prodotto e marketing. Esplora i 19 moduli e scegli il tuo percorso.">
   <section class="hero">
-    <h1>Trasforma i dati in decisioni</h1>
-    <p class="hero-sub">Il corso più completo in italiano su Data Engineering, Analytics e Marketing Data Science. Dalle basi ai sistemi in produzione.</p>
+    <p class="eyebrow">Corso gratuito in italiano</p>
+    <h1>Impara a raccogliere,<br />analizzare e usare i dati.</h1>
+    <p class="hero-sub">Collega metriche, SQL e sistemi dati alle domande di prodotto e marketing. Parti dalle conoscenze che hai e scegli cosa approfondire.</p>
     <div class="hero-cta">
-      <a href="https://ginnytech.it/course" class="btn btn-primary">Inizia a studiare ora</a>
-      <a href="#moduli" class="btn btn-ghost">Vedi i moduli ↓</a>
+      <a href="https://ginnytech.it/course" class="btn btn-primary">Inizia il corso gratuito</a>
+      <a href="/programma/" class="btn btn-ghost">Esplora il programma →</a>
+    </div>
+    <p class="hero-note">{modules.length} moduli · Una base comune · Due percorsi di approfondimento</p>
+  </section>
+
+  <section class="inner content-section" aria-labelledby="punto-partenza">
+    <h2 id="punto-partenza">Un punto di partenza per il tuo obiettivo</h2>
+    <p class="section-sub">Il programma unisce competenze tecniche e ragionamento analitico. Non devi affrontare ogni argomento allo stesso livello.</p>
+    <div class="intro-grid">
+      <article class="info-card"><span class="eyebrow">01 · Orientati</span><h3>Chiarisci cosa vuoi fare</h3><p>Confronta ruoli e attività nel mondo dei dati e organizza il tuo piano di studio.</p><a href="/programma/modulo-1/" class="text-link">Parti dal metodo di studio →</a></article>
+      <article class="info-card"><span class="eyebrow">02 · Consolida</span><h3>Lavora su dati affidabili</h3><p>Studia metriche, matematica e SQL, poi collega raccolta, modellazione e dashboard.</p><a href="/programma/#fondamenti" class="text-link">Vedi i fondamenti →</a></article>
+      <article class="info-card"><span class="eyebrow">03 · Approfondisci</span><h3>Scegli una direzione</h3><p>Prosegui con analytics e marketing oppure con la progettazione e gestione dei sistemi dati.</p><a href="#percorsi" class="text-link">Confronta i percorsi →</a></article>
     </div>
   </section>
 
-  <section id="moduli" class="modules">
-    <h2>Cosa imparerai</h2>
-    <p class="section-sub">19 moduli, 200+ lezioni. Dalla teoria alla pratica.</p>
-    <div class="module-grid">
-      {modules.map((m) => (
-        <article class="module-card">
-          <img src={`/course-module-images/${m.image}`} alt={m.title} loading="lazy" width="400" height="250" />
-          <div class="module-info">
-            <span class="module-num">MODULO {m.num}</span>
-            <h3>{m.title}</h3>
-            <p>{m.desc}</p>
-            <div class="module-meta">
-              <span>{m.lessons} LEZIONI</span>
-              {m.planUrl ? <a href={m.planUrl} class="btn btn-sm">Piano delle Lezioni</a> : null}
-            </div>
-          </div>
-        </article>
-      ))}
-    </div>
+  <section id="percorsi" class="inner content-section" aria-labelledby="titolo-percorsi">
+    <h2 id="titolo-percorsi">Due percorsi, una base comune</h2>
+    <p class="section-sub">Per analisti, marketer e chi vuole approfondire il data engineering. Ogni modulo indica le conoscenze richieste: SQL avanzato e i sistemi in tempo reale richiedono già basi tecniche.</p>
+    <LearningPaths />
+  </section>
+
+  <section id="moduli" class="inner content-section programme-summary" aria-labelledby="titolo-programma">
+    <div><p class="eyebrow">Il programma completo</p><h2 id="titolo-programma">Dai primi obiettivi alle decisioni</h2><p class="section-sub">Esplora i {modules.length} moduli con obiettivi, prerequisiti e proposte per esercitarti. Puoi seguire l’ordine consigliato o scegliere gli approfondimenti in base al tuo livello.</p></div>
+    <a href="/programma/#moduli" class="btn btn-primary">Vedi tutti i moduli →</a>
   </section>
 
   <section class="cta-bottom">
-    <h2>Pronto a dare una svolta alla tua carriera nei dati?</h2>
-    <p>Unisciti agli studenti che stanno già trasformando il loro modo di lavorare con i dati.</p>
-    <a href="https://ginnytech.it/course" class="btn btn-primary btn-lg">Inizia ora</a>
-    <a href="https://tidycal.com/andrii-d/15-minute-meeting" class="btn btn-ghost btn-lg">Prenota una call</a>
+    <h2>Hai dubbi su dove iniziare?</h2>
+    <p>Parla con Andrii del tuo obiettivo e delle competenze che vuoi sviluppare.</p>
+    <a href="/prenota-call/" class="btn btn-primary">Troviamo il tuo punto di partenza</a>
+    <a href="/informazioni/" class="btn btn-ghost">Come funziona il corso</a>
   </section>
 </BaseLayout>

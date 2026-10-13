@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ModuleCard from '../../components/ModuleCard.astro';
+import LearningPaths from '../../components/LearningPaths.astro';
+import { modules, stages } from '../../data/course';
+---
+
+<BaseLayout title="Programma e percorsi di studio" description="Esplora i 19 moduli del corso gratuito GinnyTech: obiettivi, prerequisiti e percorsi consigliati per analytics, marketing e data engineering.">
+  <section class="page-hero">
+    <p class="eyebrow">Corso gratuito · {modules.length} moduli</p>
+    <h1>Scegli da dove iniziare</h1>
+    <p class="hero-sub">Una base comune, due specializzazioni e un filo conduttore: usare dati affidabili per rispondere a domande concrete.</p>
+    <div class="hero-cta">
+      <a href="#moduli" class="btn btn-primary">Esplora i moduli</a>
+      <a href="https://ginnytech.it/course" class="btn btn-ghost">Accedi al corso gratuito</a>
+    </div>
+  </section>
+
+  <section class="page-content wide-content" aria-labelledby="prima-di-iniziare">
+    <h2 id="prima-di-iniziare">Prima di iniziare</h2>
+    <p>Se stai orientandoti nel mondo dei dati, parti dal metodo di studio e dai ruoli professionali. Poi affronta i fondamenti e la costruzione di dati affidabili. Se hai già esperienza, usa i prerequisiti di ogni modulo per scegliere gli approfondimenti.</p>
+    <div class="notice">
+      <strong>SQL avanzato richiede le basi.</strong>
+      <p>Prima del modulo 14 devi conoscere SELECT, filtri, aggregazioni e JOIN. I moduli sui modelli e sui sistemi richiedono anche le conoscenze matematiche o di programmazione indicate nelle singole guide.</p>
+    </div>
+    <h2 id="percorsi">Scegli un percorso</h2>
+    <p>Entrambi partono dall’orientamento, dai fondamenti e dai dati affidabili. Prosegui nella specializzazione più vicina al tuo obiettivo; puoi affrontare anche l’altra in un secondo momento.</p>
+    <LearningPaths showModules />
+  </section>
+
+  <section id="moduli" class="modules inner" aria-labelledby="titolo-moduli">
+    <h2 id="titolo-moduli">Il programma, tappa per tappa</h2>
+    <p class="section-sub">Per ogni modulo trovi obiettivi, conoscenze richieste, argomenti e una proposta per esercitarti. La numerazione identifica il modulo; le tappe qui sotto suggeriscono l’ordine di studio.</p>
+    {stages.map((stage, index) => (
+      <section class="curriculum-stage" id={stage.id} aria-labelledby={`titolo-${stage.id}`}>
+        <p class="eyebrow">{index === 3 || index === 4 ? 'Specializzazione a scelta' : 'Percorso comune'}</p>
+        <h3 class="stage-title" id={`titolo-${stage.id}`}>{stage.title}</h3>
+        <p class="section-sub">{stage.description}</p>
+        <div class="module-grid">
+          {stage.moduleIds.map(id => <ModuleCard module={modules.find(m => m.id === id)!} />)}
+        </div>
+      </section>
+    ))}
+  </section>
+
+  <section class="cta-bottom">
+    <h2>Hai scelto il punto di partenza?</h2>
+    <p>Apri il corso gratuito oppure confrontati con Andrii sul tuo obiettivo di studio.</p>
+    <a href="https://ginnytech.it/course" class="btn btn-primary">Vai al corso gratuito</a>
+    <a href="/prenota-call/" class="btn btn-ghost">Parliamone</a>
+  </section>
+</BaseLayout>
