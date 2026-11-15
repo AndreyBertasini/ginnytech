@@ -124,5 +124,10 @@ test('profile page exposes structured data, the course map and no private detail
   const types = graph.map((node: { '@type': string }) => node['@type']);
   expect(types).toEqual(expect.arrayContaining(['ProfilePage', 'Person', 'BreadcrumbList', 'FAQPage']));
   await expect(page.locator('.heat-col')).toHaveCount(19);
+  const person = graph.find((node: { '@type': string }) => node['@type'] === 'Person');
+  expect(person.hasCredential).toMatchObject({ name: 'ClickHouse Certified Developer', dateCreated: '2026-11-07' });
+  const certificate = await page.request.get('/certificati/clickhouse-certified-developer.pdf');
+  expect(certificate.status()).toBe(200);
+  expect(certificate.headers()['content-type']).toContain('pdf');
   await expect(page.locator('body')).not.toContainText(/SNAI|Flutter|Verona|Milano/);
 });

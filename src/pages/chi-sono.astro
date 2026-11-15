@@ -8,6 +8,15 @@ const pageUrl = `${site}/chi-sono/`;
 const linkedin = 'https://www.linkedin.com/in/andrii-dyshkantiuk/';
 const github = 'https://github.com/AndreyBertasini';
 
+const certification = {
+  name: 'ClickHouse Certified Developer',
+  issuer: 'ClickHouse, Inc.',
+  issuerUrl: 'https://clickhouse.com',
+  date: '2026-11-07',
+  dateLabel: '7 novembre 2026',
+  pdf: '/certificati/clickhouse-certified-developer.pdf',
+};
+
 // Numeri reali, calcolati dai dati del corso: niente cifre inventate.
 const moduleCount = modules.length;
 const stageCount = stages.length;
@@ -44,7 +53,7 @@ const activeCells = columns.reduce((s, c) => s + c.scores.filter(Boolean).length
 
 const stack = [
   { name: 'SQL', role: 'La base di tutto', text: 'Ogni analisi seria parte da una query che un collega può rileggere, rieseguire e contestare.' },
-  { name: 'ClickHouse', role: 'Analisi su grandi volumi', text: 'Database colonnare per aggregare milioni di eventi in secondi, senza aspettare il report del giorno dopo.' },
+  { name: 'ClickHouse', role: 'Certified Developer', text: 'Database colonnare per aggregare milioni di eventi in secondi, senza aspettare il report del giorno dopo. Certificato ufficialmente da ClickHouse, Inc.', badge: true },
   { name: 'dbt', role: 'Trasformazioni versionate', text: 'Modelli SQL con test, documentazione e dipendenze esplicite. Se una metrica cambia, si vede dove e perché.' },
   { name: 'Python', role: 'Quando SQL non basta', text: 'Modelli, analisi esplorative e script che trasformano un controllo manuale in un passaggio ripetibile.' },
   { name: 'n8n', role: 'Automazioni', text: 'Flussi che collegano API, report e notifiche. Il lavoro ripetitivo lo fa il sistema, non una persona il lunedì mattina.' },
@@ -66,7 +75,7 @@ const services = [
 
 const faqs = [
   { q: 'Chi è Andrii Dyshkantiuk?', a: `Sono un professionista dei dati: data engineering, analytics e consulenza. Ho creato GinnyTech, un corso gratuito in italiano con ${moduleCount} moduli che collegano SQL, modellazione, marketing analytics e data engineering alle decisioni di business.` },
-  { q: 'Di cosa ti occupi?', a: 'Progetto e costruisco sistemi di dati: raccolta degli eventi, modelli in dbt, database analitici come ClickHouse, automazioni con n8n e modelli previsionali in Python con CatBoost. Il fine è sempre lo stesso: numeri di cui ci si può fidare quando si decide.' },
+  { q: 'Di cosa ti occupi?', a: 'Progetto e costruisco sistemi di dati: raccolta degli eventi, modelli in dbt, database analitici come ClickHouse (sono ClickHouse Certified Developer), automazioni con n8n e modelli previsionali in Python con CatBoost. Il fine è sempre lo stesso: numeri di cui ci si può fidare quando si decide.' },
   { q: 'Il corso GinnyTech è davvero gratuito?', a: `Sì. Il programma completo, ${moduleCount} moduli divisi in ${stageCount} tappe e ${learningPaths.length} percorsi, è gratuito e in italiano. Ogni modulo ha prerequisiti chiari, risultati attesi e un’esercitazione con criteri di verifica.` },
   { q: 'Posso lavorare con te su un progetto?', a: 'Sì. Puoi prenotare una call conoscitiva: partiamo dal problema che vuoi risolvere e capiamo insieme se e come i dati possono aiutarti.' },
 ];
@@ -75,7 +84,7 @@ const chapters = ['Chi sono', 'I numeri', 'Lo stack', 'La mappa', 'Come lavoro',
 const total = String(chapters.length).padStart(2, '0');
 const ch = (i: number) => `${String(i + 1).padStart(2, '0')} / ${total}`;
 
-const description = `Andrii Dyshkantiuk, data engineering e analytics: SQL, ClickHouse, dbt, Python e modelli previsionali per decisioni migliori. Creatore del corso gratuito GinnyTech.`;
+const description = `Andrii Dyshkantiuk, data engineering e analytics, ClickHouse Certified Developer: SQL, dbt, Python e modelli previsionali per decisioni migliori. Creatore del corso gratuito GinnyTech.`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -99,6 +108,14 @@ const jsonLd = {
       description: 'Professionista dei dati: data engineering, analytics e consulenza. Creatore di GinnyTech.',
       knowsAbout: ['Data engineering', 'Marketing analytics', 'SQL', 'ClickHouse', 'dbt', 'Python', 'n8n', 'CatBoost', 'Machine learning', 'Analytics engineering'],
       sameAs: [linkedin, github],
+      hasCredential: {
+        '@type': 'EducationalOccupationalCredential',
+        name: certification.name,
+        credentialCategory: 'certification',
+        dateCreated: certification.date,
+        url: `${site}${certification.pdf}`,
+        recognizedBy: { '@type': 'Organization', name: certification.issuer, url: certification.issuerUrl },
+      },
       founder: { '@id': `${site}/#organization` },
     },
     {
@@ -136,6 +153,9 @@ const jsonLd = {
         <p class="mono lg-kicker"><span>Chi sono · GinnyTech</span><span>{ch(0)} · Il profilo</span></p>
         <nav class="mono lg-crumbs" aria-label="Percorso"><a href="/">GinnyTech</a> / <span aria-current="page">Chi sono</span></nav>
         <h1 id="hero-title">Andrii Dyshkantiuk. <span class="grad">Dati che arrivano a una decisione.</span></h1>
+        <a href={certification.pdf} class="mono cert-chip" target="_blank" rel="noopener">
+          <span class="cert-dot" aria-hidden="true"></span>{certification.name} · 2026<span class="sr-only"> (certificato PDF, si apre in una nuova scheda)</span>
+        </a>
         <p class="lg-lead">Lavoro con i dati da ingegnere e da analista: costruisco le pipeline, scrivo le query, alleno i modelli e poi mi chiedo se tutto questo cambia davvero una scelta. Se non la cambia, si torna al punto di partenza.</p>
         <div class="lg-actions">
           <a href="/prenota-call/" class="btn btn-primary btn-lg">Prenota una call</a>
@@ -180,6 +200,30 @@ const jsonLd = {
       </div>
     </section>
 
+    <!-- CERTIFICAZIONE -->
+    <section class="cert-band rv" aria-labelledby="cert-title">
+      <div class="cert-seal" aria-hidden="true">
+        <svg viewBox="0 0 120 120" width="120" height="120">
+          <defs><path id="cert-circle" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0" /></defs>
+          <circle cx="60" cy="60" r="58" fill="none" stroke="currentColor" stroke-width="1" opacity=".5" />
+          <text font-family="ui-monospace, monospace" font-size="9" letter-spacing="3" fill="currentColor"><textPath href="#cert-circle">CLICKHOUSE · CERTIFIED DEVELOPER ·</textPath></text>
+          <g fill="currentColor"><rect x="44" y="46" width="5" height="28" /><rect x="52" y="46" width="5" height="28" /><rect x="60" y="46" width="5" height="28" /><rect x="68" y="46" width="5" height="28" /><rect x="76" y="56" width="5" height="8" /></g>
+        </svg>
+      </div>
+      <div class="cert-text">
+        <p class="mono">Certificazione · {certification.dateLabel}</p>
+        <h2 id="cert-title">{certification.name}</h2>
+        <p>Ho superato l’esame ufficiale di {certification.issuer}: modellazione delle tabelle MergeTree, chiavi di ordinamento, ingestion, viste materializzate e ottimizzazione delle query. È lo stesso database che insegno nel modulo sull’<a href="/programma/modulo-12/">analisi in tempo reale con ClickHouse</a>.</p>
+      </div>
+      <div class="cert-meta">
+        <dl>
+          <div><dt class="mono">Rilasciata da</dt><dd>{certification.issuer}</dd></div>
+          <div><dt class="mono">Data</dt><dd><time datetime={certification.date}>{certification.dateLabel}</time></dd></div>
+        </dl>
+        <a href={certification.pdf} class="btn btn-primary" target="_blank" rel="noopener">Vedi il certificato <span class="sr-only">(PDF, si apre in una nuova scheda)</span></a>
+      </div>
+    </section>
+
     <!-- 03 · STACK -->
     <section class="lg-section" id="cap-3" data-chapter={`${ch(2)} · ${chapters[2]}`} aria-labelledby="stack-title">
       <header class="lg-head rv">
@@ -192,7 +236,7 @@ const jsonLd = {
           <li class={`stack-tile rv ${i === 0 ? 'stack-hl' : ''}`} style={`--i:${i}`}>
             <span class="mono stack-idx">{String(i + 1).padStart(2, '0')}</span>
             <h3>{s.name}</h3>
-            <p class="mono stack-role">{s.role}</p>
+            <p class="mono stack-role">{s.badge && <span class="cert-dot" aria-hidden="true"></span>}{s.role}</p>
             <p>{s.text}</p>
           </li>
         ))}
@@ -423,6 +467,27 @@ const jsonLd = {
   .lg-head h2 { margin: 0; font-weight: 400; letter-spacing: -0.02em; }
   .lg-head > p:not(.mono) { color: var(--color-text-muted); align-self: end; max-width: 60ch; }
 
+  /* Certificazione */
+  .cert-chip { display: inline-flex; align-items: center; gap: .55rem; margin-top: 1.5rem; padding: .45rem .75rem; border: 1px solid var(--color-accent); border-radius: 3px; color: var(--color-accent); text-decoration: none; background: rgba(34,211,238,.06); transition: background .25s ease; }
+  .cert-chip:hover { background: rgba(34,211,238,.16); color: var(--color-accent); }
+  .cert-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 0 0 rgba(34,211,238,.6); animation: cert-pulse 2.4s ease-out infinite; flex-shrink: 0; display: inline-block; margin-right: .45rem; vertical-align: middle; }
+  .cert-chip .cert-dot { margin-right: 0; }
+  @keyframes cert-pulse { 0% { box-shadow: 0 0 0 0 rgba(34,211,238,.55); } 70%, 100% { box-shadow: 0 0 0 9px rgba(34,211,238,0); } }
+  .cert-band { display: grid; grid-template-columns: auto minmax(0, 1.6fr) minmax(0, 1fr); gap: 2.5rem; align-items: center; margin: 4.5rem 0 0; padding: 2.25rem; border-radius: 4px; background: linear-gradient(120deg, var(--indigo-deep) 0%, #3730a3 55%, #0e7490 100%); color: #fff; }
+  .cert-seal { color: #fff; }
+  .cert-seal svg { display: block; animation: cert-spin 40s linear infinite; }
+  .cert-seal svg g { transform-origin: 60px 60px; }
+  @keyframes cert-spin { to { transform: rotate(360deg); } }
+  .cert-text .mono { color: #c7d2fe; }
+  .cert-text h2 { margin: .5rem 0 .75rem; font-weight: 400; letter-spacing: -0.02em; font-size: clamp(1.7rem, 3.5vw, 2.6rem); }
+  .cert-text p:not(.mono) { color: #e0e7ff; max-width: 60ch; }
+  .cert-text a { color: #fff; }
+  .cert-meta dl { display: grid; gap: .75rem; margin-bottom: 1.25rem; }
+  .cert-meta dt { color: #c7d2fe; font-size: .62rem; }
+  .cert-meta dd { margin: 0; font-size: 1.05rem; }
+  .cert-meta .btn-primary { background: #fff; color: #1e1b4b; }
+  .cert-meta .btn-primary:hover { background: var(--color-accent); color: #07070c; }
+
   /* Stack */
   .stack-grid { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
   .stack-tile { position: relative; padding: 1.75rem 1.5rem 2rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); transition: background .3s ease; }
@@ -508,6 +573,9 @@ const jsonLd = {
   .lg-rail-bar i { position: absolute; inset: 0; transform-origin: left; transform: scaleX(var(--p, 0)); background: linear-gradient(90deg, var(--color-primary), var(--color-accent)); }
 
   @media (max-width: 1000px) {
+    .cert-band { grid-template-columns: auto minmax(0, 1fr); }
+    .cert-meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+    .cert-meta dl { grid-auto-flow: column; gap: 2rem; margin: 0; }
     .lg-hero { grid-template-columns: 1fr; }
     .lg-ghost { left: -2%; top: 22%; }
     .pr-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
@@ -524,6 +592,10 @@ const jsonLd = {
     .kpi-cyan, .kpi-outline, .kpi-soft, .kpi-dark { grid-column: span 3; }
     .lg-kicker span:last-child { display: none; }
   }
+  @media (max-width: 600px) {
+    .cert-band { grid-template-columns: 1fr; padding: 1.5rem; gap: 1.25rem; margin-top: 3rem; }
+    .cert-seal svg { width: 84px; height: 84px; }
+  }
   @media (max-width: 480px) {
     .pr-grid { grid-template-columns: 1fr; }
     .pr { min-height: 220px; }
@@ -533,5 +605,6 @@ const jsonLd = {
   @media (prefers-reduced-motion: reduce) {
     :global(.js) .rv, :global(.js) .heat .heat-cell:not(.q-0) { opacity: 1; transform: none; transition: none; }
     .lg-rail, a.kpi, .stack-tile::after { transition: none; }
+    .cert-dot, .cert-seal svg { animation: none; }
   }
 </style>
