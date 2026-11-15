@@ -2,9 +2,32 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { glossaryTerms } from '../data/glossary';
 import { modules } from '../data/course';
+import { absolute, breadcrumb, graph, ORG_ID } from '../lib/seo';
+
+const setId = `${absolute('/glossario/')}#glossario`;
+const jsonLd = graph(
+  {
+    '@type': 'DefinedTermSet',
+    '@id': setId,
+    name: 'Glossario dei dati GinnyTech',
+    url: absolute('/glossario/'),
+    inLanguage: 'it',
+    publisher: { '@id': ORG_ID },
+    hasDefinedTerm: glossaryTerms.map(t => ({
+      '@type': 'DefinedTerm',
+      '@id': absolute(`/glossario/#${t.id}`),
+      name: t.term,
+      description: t.definition,
+      url: absolute(`/glossario/#${t.id}`),
+      inDefinedTermSet: { '@id': setId },
+    })),
+  },
+  breadcrumb([{ name: 'Glossario', path: '/glossario/' }]),
+);
 ---
 
-<BaseLayout title="Glossario dei dati" description="15 termini di analytics e data engineering con definizioni, esempi pratici e collegamenti ai moduli GinnyTech.">
+<BaseLayout title="Glossario dei dati" description={`${glossaryTerms.length} termini di analytics e data engineering con definizioni, esempi pratici e collegamenti ai moduli GinnyTech.`}>
+  <script slot="head" type="application/ld+json" set:html={jsonLd} />
   <section class="page-hero"><h1>Glossario dei dati</h1><p class="hero-sub">{glossaryTerms.length} termini del percorso, con una definizione e un esempio. Parti da qui quando incontri un concetto nuovo.</p></section>
   <section class="page-content glossary-content">
     <nav class="glossary-index" aria-label="Indice del glossario">{glossaryTerms.map(item => <a href={`#${item.id}`}>{item.term}</a>)}</nav>
