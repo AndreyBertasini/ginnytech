@@ -116,3 +116,13 @@ test('articles clearly distinguish previews and the site makes no external font 
   await expect(page.locator('.article-card')).toHaveCount(4);
   expect(destinations.some(url => /fonts\.googleapis\.com|fonts\.gstatic\.com/.test(url))).toBe(false);
 });
+
+test('profile page exposes structured data, the course map and no private details', async ({ page }) => {
+  await page.goto('/chi-sono/');
+  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'profile');
+  const graph = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent() ?? '{}')['@graph'];
+  const types = graph.map((node: { '@type': string }) => node['@type']);
+  expect(types).toEqual(expect.arrayContaining(['ProfilePage', 'Person', 'BreadcrumbList', 'FAQPage']));
+  await expect(page.locator('.heat-col')).toHaveCount(19);
+  await expect(page.locator('body')).not.toContainText(/SNAI|Flutter|Verona|Milano/);
+});
