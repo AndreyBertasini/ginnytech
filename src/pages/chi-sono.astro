@@ -1,22 +1,610 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { stages, modules, learningPaths } from '../data/course';
+import { glossaryTerms } from '../data/glossary';
+
+const site = 'https://ginnytech.it';
+const pageUrl = `${site}/chi-sono/`;
+const linkedin = 'https://www.linkedin.com/in/andrii-dyshkantiuk/';
+const github = 'https://github.com/AndreyBertasini';
+
+const certification = {
+  name: 'ClickHouse Certified Developer',
+  issuer: 'ClickHouse, Inc.',
+  issuerUrl: 'https://clickhouse.com',
+  date: '2026-11-07',
+  dateLabel: '7 novembre 2026',
+  pdf: '/certificati/clickhouse-certified-developer.pdf',
+};
+
+// Numeri reali, calcolati dai dati del corso: niente cifre inventate.
+const moduleCount = modules.length;
+const stageCount = stages.length;
+const topicCount = modules.reduce((sum, m) => sum + m.topics.length, 0);
+const outcomeCount = modules.reduce((sum, m) => sum + m.outcomes.length, 0);
+const glossaryCount = glossaryTerms.length;
+
+// Mappa del corso: moduli × aree di competenza. L'intensità conta quante volte
+// l'area compare nei testi reali del modulo (titolo, sintesi, argomenti, risultati, esercitazione).
+const areas = [
+  { label: 'SQL', re: /\bsql\b|query|join|window/g },
+  { label: 'Modelli dati', re: /modellazion|warehouse|grain|dbt|trasformazion|semantic|storicizz|contract/g },
+  { label: 'Metriche', re: /metric|kpi|indicator|baseline/g },
+  { label: 'Marketing', re: /marketing|campagn|funnel|retention|coort|\bcac\b|\bltv\b|conversion|attivazion/g },
+  { label: 'Statistica', re: /statistic|probabilit|a\/b|inferenz|distribuz|significativ|causal|esperiment/g },
+  { label: 'Previsioni', re: /previs|forecast|prediction|regression|scenari|modelli predittiv/g },
+  { label: 'Pipeline', re: /pipeline|kafka|stream|ingestion|lake|storage|tempo reale|real.?time|clickhouse|deploy|monitor/g },
+  { label: 'Dashboard', re: /dashboard|visualizz|report|alert/g },
+  { label: 'Decisioni', re: /decision|decid|raccomand|evidenz|ragionament/g },
+];
+const columns = stages.flatMap((stage, stageIndex) =>
+  stage.moduleIds.map((id, i) => {
+    const m = modules.find(mod => mod.id === id)!;
+    const text = [m.title, m.summary, ...m.keywords, ...m.topics, ...m.outcomes, m.practice.brief, m.practice.deliverable, ...m.practice.criteria].join(' ').toLowerCase();
+    const scores = areas.map(a => (text.match(a.re) ?? []).length);
+    return { m, stageIndex, stageTitle: stage.title, firstOfStage: i === 0, scores };
+  }),
+);
+const maxScore = Math.max(...columns.flatMap(c => c.scores));
+const level = (n: number) => (n === 0 ? 0 : Math.min(4, Math.ceil((n / maxScore) * 4)));
+let peak = { col: columns[0], area: 0, score: -1 };
+for (const c of columns) c.scores.forEach((sc, ai) => { if (sc > peak.score) peak = { col: c, area: ai, score: sc }; });
+const activeCells = columns.reduce((s, c) => s + c.scores.filter(Boolean).length, 0);
+
+const stack = [
+  { name: 'SQL', role: 'La base di tutto', text: 'Ogni analisi seria parte da una query che un collega può rileggere, rieseguire e contestare.' },
+  { name: 'ClickHouse', role: 'Certified Developer', text: 'Database colonnare per aggregare milioni di eventi in secondi, senza aspettare il report del giorno dopo. Certificato ufficialmente da ClickHouse, Inc.', badge: true },
+  { name: 'dbt', role: 'Trasformazioni versionate', text: 'Modelli SQL con test, documentazione e dipendenze esplicite. Se una metrica cambia, si vede dove e perché.' },
+  { name: 'Python', role: 'Quando SQL non basta', text: 'Modelli, analisi esplorative e script che trasformano un controllo manuale in un passaggio ripetibile.' },
+  { name: 'n8n', role: 'Automazioni', text: 'Flussi che collegano API, report e notifiche. Il lavoro ripetitivo lo fa il sistema, non una persona il lunedì mattina.' },
+  { name: 'CatBoost', role: 'Modelli previsionali', text: 'Gradient boosting su dati tabellari pieni di variabili categoriche: churn, propensione, valore del cliente.' },
+];
+
+const principles = [
+  { title: 'Prima il problema, poi lo strumento', text: 'Una dashboard senza una decisione da prendere è arredamento. Parto sempre dalla domanda: chi deciderà cosa, con quale numero.' },
+  { title: 'Cerca il collo di bottiglia', text: 'In ogni sistema di dati c’è un punto che rallenta tutto il resto. Ottimizzare altrove produce lavoro, non risultati.' },
+  { title: 'Ogni numero ha un’ipotesi dietro', text: 'Definizioni, filtri, finestre temporali: li scrivo accanto al risultato. Così chi legge sa quanto fidarsi.' },
+  { title: 'Se non si può rifare, non è un’analisi', text: 'Codice versionato, dati tracciabili, passaggi documentati. Un risultato che nessuno sa ricostruire è un’opinione.' },
+];
+
+const services = [
+  { tag: 'Aziende', title: 'Dati affidabili per decidere', text: 'Tracciamento, modello dei dati, metriche condivise e dashboard che reggono alle domande scomode.', href: '/prenota-call/', cta: 'Parliamone' },
+  { tag: 'Marketing', title: 'Misurare ciò che conta', text: 'Attribuzione, esperimenti, segmentazione e modelli previsionali collegati a budget e obiettivi reali.', href: '/prenota-call/', cta: 'Prenota una call' },
+  { tag: 'Chi studia', title: 'Il corso gratuito', text: `${moduleCount} moduli in italiano, dalla prima query SQL ai flussi di eventi in tempo reale, ognuno con un’esercitazione concreta.`, href: '/programma/', cta: 'Vedi il programma' },
+];
+
+const faqs = [
+  { q: 'Chi è Andrii Dyshkantiuk?', a: `Sono un professionista dei dati: data engineering, analytics e consulenza. Ho creato GinnyTech, un corso gratuito in italiano con ${moduleCount} moduli che collegano SQL, modellazione, marketing analytics e data engineering alle decisioni di business.` },
+  { q: 'Di cosa ti occupi?', a: 'Progetto e costruisco sistemi di dati: raccolta degli eventi, modelli in dbt, database analitici come ClickHouse (sono ClickHouse Certified Developer), automazioni con n8n e modelli previsionali in Python con CatBoost. Il fine è sempre lo stesso: numeri di cui ci si può fidare quando si decide.' },
+  { q: 'Il corso GinnyTech è davvero gratuito?', a: `Sì. Il programma completo, ${moduleCount} moduli divisi in ${stageCount} tappe e ${learningPaths.length} percorsi, è gratuito e in italiano. Ogni modulo ha prerequisiti chiari, risultati attesi e un’esercitazione con criteri di verifica.` },
+  { q: 'Posso lavorare con te su un progetto?', a: 'Sì. Puoi prenotare una call conoscitiva: partiamo dal problema che vuoi risolvere e capiamo insieme se e come i dati possono aiutarti.' },
+];
+
+const chapters = ['Chi sono', 'I numeri', 'Lo stack', 'La mappa', 'Come lavoro', 'Cosa posso fare', 'Domande'];
+const total = String(chapters.length).padStart(2, '0');
+const ch = (i: number) => `${String(i + 1).padStart(2, '0')} / ${total}`;
+
+const description = `Andrii Dyshkantiuk, data engineering e analytics, ClickHouse Certified Developer: SQL, dbt, Python e modelli previsionali per decisioni migliori. Creatore del corso gratuito GinnyTech.`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'ProfilePage',
+      '@id': `${pageUrl}#page`,
+      url: pageUrl,
+      name: 'Chi sono — Andrii Dyshkantiuk',
+      description,
+      inLanguage: 'it-IT',
+      mainEntity: { '@id': `${pageUrl}#person` },
+      breadcrumb: { '@id': `${pageUrl}#breadcrumb` },
+    },
+    {
+      '@type': 'Person',
+      '@id': `${pageUrl}#person`,
+      name: 'Andrii Dyshkantiuk',
+      url: pageUrl,
+      jobTitle: 'Data engineer e analytics consultant',
+      description: 'Professionista dei dati: data engineering, analytics e consulenza. Creatore di GinnyTech.',
+      knowsAbout: ['Data engineering', 'Marketing analytics', 'SQL', 'ClickHouse', 'dbt', 'Python', 'n8n', 'CatBoost', 'Machine learning', 'Analytics engineering'],
+      sameAs: [linkedin, github],
+      hasCredential: {
+        '@type': 'EducationalOccupationalCredential',
+        name: certification.name,
+        credentialCategory: 'certification',
+        dateCreated: certification.date,
+        url: `${site}${certification.pdf}`,
+        recognizedBy: { '@type': 'Organization', name: certification.issuer, url: certification.issuerUrl },
+      },
+      founder: { '@id': `${site}/#organization` },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${site}/#organization`,
+      name: 'GinnyTech',
+      url: `${site}/`,
+      founder: { '@id': `${pageUrl}#person` },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      '@id': `${pageUrl}#breadcrumb`,
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'GinnyTech', item: `${site}/` },
+        { '@type': 'ListItem', position: 2, name: 'Chi sono', item: pageUrl },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${pageUrl}#faq`,
+      mainEntity: faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+    },
+  ],
+};
 ---
 
-<BaseLayout title="Chi sono — Andrii Dyshkantiuk" description="Conosci Andrii Dyshkantiuk, creatore di GinnyTech, e il metodo che collega competenze tecniche, analisi e decisioni.">
-  <section class="page-hero"><p class="eyebrow">Il creatore di GinnyTech</p><h1>Ciao, sono Andrii.</h1><p class="hero-sub">Data engineering e analisi per comprendere i problemi e prendere decisioni più consapevoli.</p></section>
-  <section class="page-content">
-    <h2>Perché ho creato GinnyTech</h2>
-    <p>Sono <strong>Andrii Dyshkantiuk</strong>. Mi occupo di dati, analytics e consulenza. Ho creato GinnyTech per condividere un modo di lavorare che collega strumenti tecnici e domande di business.</p>
-    <p>Il punto di partenza è capire il problema. Da lì si scelgono i dati da raccogliere, si controlla la loro qualità e si costruisce un’analisi che distingua ciò che sappiamo da ciò che dobbiamo ancora verificare.</p>
-    <h2>Come affronto lo studio</h2>
-    <ul>
-      <li><strong>Una domanda concreta:</strong> sapere perché stai studiando un argomento.</li>
-      <li><strong>Un risultato da mostrare:</strong> una query, un modello, una dashboard o una raccomandazione.</li>
-      <li><strong>Una verifica:</strong> spiegare ipotesi, controlli e limiti del lavoro.</li>
-    </ul>
-    <p>Il corso gratuito segue questo filo attraverso analytics, marketing e data engineering. Il programma ti aiuta a scegliere le competenze più vicine al tuo obiettivo.</p>
-    <h2>Approfondisci o scrivimi</h2>
-    <p>Trovi il mio profilo professionale su <a href="https://www.linkedin.com/in/andrii-dyshkantiuk/" target="_blank" rel="noopener noreferrer">LinkedIn (si apre in una nuova scheda)</a>. Per parlare del percorso o di un progetto, puoi <a href="/prenota-call/">prenotare un incontro</a>.</p>
-    <div class="cta-box"><a href="/programma/" class="btn btn-primary">Scopri il programma GinnyTech</a></div>
-  </section>
+<BaseLayout title="Chi sono — Andrii Dyshkantiuk, data engineering e analytics" {description} ogType="profile">
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <div class="lg">
+    <!-- 01 · HERO -->
+    <section class="lg-hero" id="cap-1" data-chapter={`${ch(0)} · ${chapters[0]}`} aria-labelledby="hero-title">
+      <div class="lg-ghost" aria-hidden="true">DATI</div>
+      <div class="lg-hero-text rv">
+        <p class="mono lg-kicker"><span>Chi sono · GinnyTech</span><span>{ch(0)} · Il profilo</span></p>
+        <nav class="mono lg-crumbs" aria-label="Percorso"><a href="/">GinnyTech</a> / <span aria-current="page">Chi sono</span></nav>
+        <h1 id="hero-title">Andrii Dyshkantiuk. <span class="grad">Dati che arrivano a una decisione.</span></h1>
+        <a href={certification.pdf} class="mono cert-chip" target="_blank" rel="noopener">
+          <span class="cert-dot" aria-hidden="true"></span>{certification.name} · 2026<span class="sr-only"> (certificato PDF, si apre in una nuova scheda)</span>
+        </a>
+        <p class="lg-lead">Lavoro con i dati da ingegnere e da analista: costruisco le pipeline, scrivo le query, alleno i modelli e poi mi chiedo se tutto questo cambia davvero una scelta. Se non la cambia, si torna al punto di partenza.</p>
+        <div class="lg-actions">
+          <a href="/prenota-call/" class="btn btn-primary btn-lg">Prenota una call</a>
+          <a href="/programma/" class="btn btn-ghost btn-lg">Il corso gratuito</a>
+        </div>
+      </div>
+
+      <div class="lg-kpis" id="cap-2" data-chapter={`${ch(1)} · ${chapters[1]}`} aria-label="GinnyTech in numeri">
+        <a href="/programma/" class="kpi kpi-xl kpi-indigo rv">
+          <span class="mono kpi-label">Moduli del corso gratuito <span class="tag">Programma</span></span>
+          <span class="kpi-num"><span class="mono kpi-unit">N°</span><span data-count={moduleCount}>{moduleCount}</span></span>
+        </a>
+        <div class="kpi kpi-cyan rv">
+          <span class="mono kpi-label">Argomenti trattati</span>
+          <span class="kpi-num" data-count={topicCount}>{topicCount}</span>
+        </div>
+        <div class="kpi kpi-outline rv">
+          <span class="mono kpi-label">Tappe del percorso</span>
+          <span class="kpi-num" data-count={stageCount}>{stageCount}</span>
+        </div>
+        <div class="kpi kpi-soft rv">
+          <span class="mono kpi-label">Risultati di apprendimento</span>
+          <span class="kpi-num" data-count={outcomeCount}>{outcomeCount}</span>
+        </div>
+        <a href="/glossario/" class="kpi kpi-dark rv">
+          <span class="mono kpi-label">Termini nel glossario <span class="tag">Glossario</span></span>
+          <span class="kpi-num" data-count={glossaryCount}>{glossaryCount}</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- BIO -->
+    <section class="lg-row lg-bio" aria-labelledby="bio-title">
+      <header class="lg-side rv">
+        <p class="mono">{ch(0)}</p>
+        <h2 id="bio-title">Perché faccio questo lavoro</h2>
+      </header>
+      <div class="lg-body rv">
+        <p class="lg-big">Mi occupo di <strong>data engineering</strong>, <strong>marketing analytics</strong> e consulenza. In pratica sto nel punto in cui i dati grezzi diventano un numero che qualcuno userà per decidere.</p>
+        <p>Il problema raramente è lo strumento. Di solito è una metrica definita in tre modi diversi, un tracciamento che perde eventi, un modello che nessuno sa più rieseguire. Il mio lavoro è rendere visibili questi punti deboli e sistemarli, partendo da quello che rallenta tutto il resto.</p>
+        <p>Ho creato <strong>GinnyTech</strong> perché in italiano mancava un percorso che tenesse insieme le due metà del mestiere: la tecnica, cioè SQL, modellazione e pipeline, e il giudizio, cioè capire quale domanda vale la pena porsi. Il corso è gratuito e segue lo stesso metodo che uso con i clienti.</p>
+      </div>
+    </section>
+
+    <!-- CERTIFICAZIONE -->
+    <section class="cert-band rv" aria-labelledby="cert-title">
+      <div class="cert-seal" aria-hidden="true">
+        <svg viewBox="0 0 120 120" width="120" height="120">
+          <defs><path id="cert-circle" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0" /></defs>
+          <circle cx="60" cy="60" r="58" fill="none" stroke="currentColor" stroke-width="1" opacity=".5" />
+          <text font-family="ui-monospace, monospace" font-size="9" letter-spacing="3" fill="currentColor"><textPath href="#cert-circle">CLICKHOUSE · CERTIFIED DEVELOPER ·</textPath></text>
+          <g fill="currentColor"><rect x="44" y="46" width="5" height="28" /><rect x="52" y="46" width="5" height="28" /><rect x="60" y="46" width="5" height="28" /><rect x="68" y="46" width="5" height="28" /><rect x="76" y="56" width="5" height="8" /></g>
+        </svg>
+      </div>
+      <div class="cert-text">
+        <p class="mono">Certificazione · {certification.dateLabel}</p>
+        <h2 id="cert-title">{certification.name}</h2>
+        <p>Ho superato l’esame ufficiale di {certification.issuer}: modellazione delle tabelle MergeTree, chiavi di ordinamento, ingestion, viste materializzate e ottimizzazione delle query. È lo stesso database che insegno nel modulo sull’<a href="/programma/modulo-12/">analisi in tempo reale con ClickHouse</a>.</p>
+      </div>
+      <div class="cert-meta">
+        <dl>
+          <div><dt class="mono">Rilasciata da</dt><dd>{certification.issuer}</dd></div>
+          <div><dt class="mono">Data</dt><dd><time datetime={certification.date}>{certification.dateLabel}</time></dd></div>
+        </dl>
+        <a href={certification.pdf} class="btn btn-primary" target="_blank" rel="noopener">Vedi il certificato <span class="sr-only">(PDF, si apre in una nuova scheda)</span></a>
+      </div>
+    </section>
+
+    <!-- 03 · STACK -->
+    <section class="lg-section" id="cap-3" data-chapter={`${ch(2)} · ${chapters[2]}`} aria-labelledby="stack-title">
+      <header class="lg-head rv">
+        <p class="mono">{ch(2)} · Lo stack</p>
+        <h2 id="stack-title">Gli strumenti che uso ogni giorno</h2>
+        <p>Pochi, scelti bene, e ognuno con un compito preciso.</p>
+      </header>
+      <ul class="stack-grid" role="list">
+        {stack.map((s, i) => (
+          <li class={`stack-tile rv ${i === 0 ? 'stack-hl' : ''}`} style={`--i:${i}`}>
+            <span class="mono stack-idx">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{s.name}</h3>
+            <p class="mono stack-role">{s.badge && <span class="cert-dot" aria-hidden="true"></span>}{s.role}</p>
+            <p>{s.text}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- 04 · MAPPA -->
+    <section class="lg-section" id="cap-4" data-chapter={`${ch(3)} · ${chapters[3]}`} aria-labelledby="map-title">
+      <header class="lg-head rv">
+        <p class="mono">{ch(3)} · La mappa</p>
+        <h2 id="map-title">Dove il corso alza la voce</h2>
+        <p>Ogni colonna è un modulo, nell’ordine del percorso. Ogni riga è un’area di competenza. Più il quadrato è acceso, più quel modulo ci lavora sopra: {activeCells} incroci attivi su {columns.length * areas.length}. Si vede subito dove il corso parte dalle basi e dove arriva alle decisioni.</p>
+      </header>
+
+      <figure class="heat rv">
+        <p class="mono heat-peak" aria-hidden="true">Picco · M{String(peak.col.m.id).padStart(2, '0')} {peak.col.m.title} · {areas[peak.area].label}</p>
+        <div class="heat-scroll">
+          <div class="heat-grid" style={`--cols:${columns.length}`} role="img" aria-label={`Mappa del corso: ${moduleCount} moduli incrociati con ${areas.length} aree di competenza. Il picco è il modulo ${peak.col.m.id}, ${peak.col.m.title}, sull'area ${areas[peak.area].label}.`}>
+            <span class="heat-corner" aria-hidden="true"></span>
+            {columns.map(c => (
+              <span class={`mono heat-stage ${c.firstOfStage ? 'is-first' : ''}`} aria-hidden="true">{c.firstOfStage ? String(c.stageIndex + 1).padStart(2, '0') : ''}</span>
+            ))}
+            {areas.map((area, r) => (
+              <>
+                <span class="mono heat-row" aria-hidden="true">{area.label}</span>
+                {columns.map((c, ci) => {
+                  const n = c.scores[r];
+                  const isPeak = c === peak.col && r === peak.area;
+                  return <span class={`heat-cell q-${level(n)} ${isPeak ? 'is-peak' : ''}`} style={`--d:${ci * 22 + r * 35}ms`} title={`M${c.m.id} · ${area.label}: ${n} riferimenti`}></span>;
+                })}
+              </>
+            ))}
+            <span class="heat-corner" aria-hidden="true"></span>
+            {columns.map(c => (
+              <a class={`mono heat-col ${c === peak.col ? 'is-peak' : ''}`} href={`/programma/${c.m.slug}/`} title={c.m.title} aria-label={`Modulo ${c.m.id}: ${c.m.title}`}>{String(c.m.id).padStart(2, '0')}</a>
+            ))}
+          </div>
+        </div>
+        <figcaption class="mono heat-legend">
+          <span>Poco</span>
+          <span class="legend-scale" aria-hidden="true">{[0, 1, 2, 3, 4].map(q => <i class={`q-${q}`}></i>)}</span>
+          <span>Molto</span>
+          <span class="legend-sep">1 quadrato = 1 modulo × 1 area · numeri in alto = tappa · clicca un modulo per aprirlo</span>
+        </figcaption>
+      </figure>
+
+      <ol class="stage-list" role="list">
+        {stages.map((s, i) => (
+          <li class="rv"><span class="stage-dot"></span><span class="mono">{String(i + 1).padStart(2, '0')}</span><strong>{s.title}</strong><span class="stage-desc">{s.description}</span></li>
+        ))}
+      </ol>
+    </section>
+
+    <!-- 05 · PRINCIPI -->
+    <section class="lg-section" id="cap-5" data-chapter={`${ch(4)} · ${chapters[4]}`} aria-labelledby="pr-title">
+      <header class="lg-head rv">
+        <p class="mono">{ch(4)} · Come lavoro</p>
+        <h2 id="pr-title">Quattro regole che non negozio</h2>
+      </header>
+      <ol class="pr-grid" role="list">
+        {principles.map((p, i) => (
+          <li class={`pr rv pr-${i}`}>
+            <span class="pr-num" aria-hidden="true">{i + 1}</span>
+            <h3>{p.title}</h3>
+            <p>{p.text}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <!-- 06 · SERVIZI -->
+    <section class="lg-section" id="cap-6" data-chapter={`${ch(5)} · ${chapters[5]}`} aria-labelledby="sv-title">
+      <header class="lg-head rv">
+        <p class="mono">{ch(5)} · Cosa posso fare</p>
+        <h2 id="sv-title">Con chi lavoro</h2>
+      </header>
+      <div class="sv-grid">
+        {services.map((s, i) => (
+          <article class={`sv rv sv-${i}`}>
+            <p class="mono sv-tag">{s.tag}</p>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+            <a href={s.href} class="sv-link mono">{s.cta} →</a>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- 07 · FAQ -->
+    <section class="lg-row" id="cap-7" data-chapter={`${ch(6)} · ${chapters[6]}`} aria-labelledby="faq-title">
+      <header class="lg-side rv">
+        <p class="mono">{ch(6)} · Domande</p>
+        <h2 id="faq-title">Domande frequenti</h2>
+      </header>
+      <div class="lg-body faq">
+        {faqs.map((f, i) => (
+          <details class="rv" open={i === 0}>
+            <summary><h3>{f.q}</h3></summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="lg-cta rv" aria-labelledby="cta-title">
+      <p class="mono">Fine · Parliamone</p>
+      <h2 id="cta-title">Hai un problema di dati? Partiamo da lì.</h2>
+      <p>Una call conoscitiva serve a capire se il problema è nei dati, nel processo o nella domanda. Spesso è un po’ tutte e tre.</p>
+      <div class="lg-actions">
+        <a href="/prenota-call/" class="btn btn-primary btn-lg">Prenota una call</a>
+        <a href={linkedin} class="btn btn-ghost btn-lg" target="_blank" rel="noopener noreferrer me">LinkedIn <span class="sr-only">(si apre in una nuova scheda)</span></a>
+      </div>
+    </section>
+  </div>
+
+  <div class="lg-rail mono" aria-hidden="true">
+    <span class="lg-rail-label">{ch(0)} · {chapters[0]}</span>
+    <span class="lg-rail-bar"><i></i></span>
+  </div>
 </BaseLayout>
+
+<script>
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reveal = document.querySelectorAll<HTMLElement>('.lg .rv, .heat');
+
+  const animateCount = (el: HTMLElement) => {
+    const target = Number(el.dataset.count);
+    if (reduce || !target) return;
+    const start = performance.now();
+    const dur = 1100;
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / dur);
+      el.textContent = String(Math.round(target * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        e.target.classList.add('in');
+        e.target.querySelectorAll<HTMLElement>('[data-count]').forEach(animateCount);
+        if ((e.target as HTMLElement).dataset.count) animateCount(e.target as HTMLElement);
+        io.unobserve(e.target);
+      }
+    }, { threshold: 0.15 });
+    reveal.forEach(el => io.observe(el));
+
+    // Barra dei capitoli in basso, come una storia a capitoli.
+    const label = document.querySelector<HTMLElement>('.lg-rail-label');
+    const rail = document.querySelector<HTMLElement>('.lg-rail');
+    const chapterIo = new IntersectionObserver(entries => {
+      for (const e of entries) if (e.isIntersecting && label) label.textContent = (e.target as HTMLElement).dataset.chapter ?? '';
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    document.querySelectorAll<HTMLElement>('[data-chapter]').forEach(el => chapterIo.observe(el));
+
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      rail?.style.setProperty('--p', String(max > 0 ? scrollY / max : 0));
+      rail?.classList.toggle('on', scrollY > 200);
+    };
+    addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  } else {
+    reveal.forEach(el => el.classList.add('in'));
+  }
+</script>
+
+<style>
+  .lg {
+    --mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+    --indigo-deep: #4f46e5;
+    --line: var(--color-border);
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+  }
+  .mono { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* reveal */
+  :global(.js) .rv { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i, 0) * 70ms); }
+  :global(.js) .rv.in { opacity: 1; transform: none; }
+
+  /* HERO */
+  .lg-hero { position: relative; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 2.5rem; padding: 3rem 0 4rem; border-bottom: 1px solid var(--line); overflow: hidden; }
+  .lg-ghost { position: absolute; left: 18%; top: 50%; transform: translateY(-50%); font-size: clamp(8rem, 26vw, 22rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1; color: transparent; -webkit-text-stroke: 1px rgba(129,140,248,.14); pointer-events: none; user-select: none; z-index: 0; }
+  .lg-hero-text { position: relative; z-index: 1; align-self: center; }
+  .lg-kicker { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .lg-crumbs { margin-bottom: 1.5rem; }
+  .lg-crumbs a { color: var(--color-text-muted); }
+  .lg-hero h1 { margin: 0; max-width: none; font-size: clamp(2.3rem, 5.4vw, 4.4rem); font-weight: 400; letter-spacing: -0.03em; line-height: 1.04; }
+  .grad { display: block; font-weight: 700; background: linear-gradient(110deg, var(--color-primary-hover), var(--color-accent)); background-clip: text; -webkit-background-clip: text; color: transparent; }
+  .lg-lead { color: var(--color-text-muted); font-size: 1.08rem; max-width: 560px; margin: 1.5rem 0 2rem; }
+  .lg-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+
+  /* KPI blocks */
+  .lg-kpis { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); grid-auto-rows: minmax(120px, auto); gap: 10px; align-self: center; }
+  .kpi { display: flex; flex-direction: column; justify-content: space-between; padding: 1rem 1.1rem; border-radius: 4px; text-decoration: none; color: inherit; min-width: 0; }
+  .kpi-label { display: flex; justify-content: space-between; align-items: start; gap: .5rem; color: inherit; font-weight: 700; font-size: .66rem; }
+  .tag { border: 1px solid currentColor; padding: .15rem .35rem; letter-spacing: .06em; white-space: nowrap; }
+  .kpi-num { font-size: clamp(2.6rem, 5.5vw, 4.6rem); font-weight: 300; letter-spacing: -0.04em; line-height: .95; font-variant-numeric: tabular-nums; }
+  .kpi-unit { font-size: .7rem; margin-right: .4rem; color: inherit; vertical-align: super; }
+  .kpi-xl { grid-column: span 6; min-height: 210px; }
+  .kpi-xl .kpi-num { font-size: clamp(4rem, 10vw, 7.5rem); }
+  .kpi-indigo { background: var(--indigo-deep); color: #fff; }
+  .kpi-cyan { grid-column: span 3; background: var(--color-accent); color: #07070c; }
+  .kpi-outline { grid-column: span 3; border: 1px solid var(--color-primary-hover); color: var(--color-primary-hover); background: rgba(99,102,241,.06); }
+  .kpi-soft { grid-column: span 3; background: #c7d2fe; color: #07070c; }
+  .kpi-dark { grid-column: span 3; background: var(--color-surface); border: 1px solid var(--line); color: var(--color-accent); }
+  a.kpi { transition: transform .25s ease, filter .25s ease; }
+  a.kpi:hover { transform: translateY(-3px); filter: brightness(1.08); color: inherit; }
+  .kpi-indigo:hover { color: #fff; }
+
+  /* Rows / sections */
+  .lg-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 2.5rem; padding: 4.5rem 0; border-bottom: 1px solid var(--line); }
+  .lg-side h2 { margin-top: .75rem; }
+  .lg-side { align-self: start; position: sticky; top: 90px; }
+  .lg-body p { color: var(--color-text-muted); margin-bottom: 1.1rem; max-width: 70ch; }
+  .lg-body strong { color: var(--color-text); }
+  .lg-body .lg-big { color: var(--color-text); font-size: clamp(1.25rem, 2.3vw, 1.65rem); line-height: 1.45; font-weight: 300; }
+  .lg-section { padding: 4.5rem 0; border-bottom: 1px solid var(--line); }
+  .lg-head { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,2fr); gap: .5rem 2.5rem; margin-bottom: 2.5rem; }
+  .lg-head .mono { grid-column: 1 / -1; }
+  .lg-head h2 { margin: 0; font-weight: 400; letter-spacing: -0.02em; }
+  .lg-head > p:not(.mono) { color: var(--color-text-muted); align-self: end; max-width: 60ch; }
+
+  /* Certificazione */
+  .cert-chip { display: inline-flex; align-items: center; gap: .55rem; margin-top: 1.5rem; padding: .45rem .75rem; border: 1px solid var(--color-accent); border-radius: 3px; color: var(--color-accent); text-decoration: none; background: rgba(34,211,238,.06); transition: background .25s ease; }
+  .cert-chip:hover { background: rgba(34,211,238,.16); color: var(--color-accent); }
+  .cert-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 0 0 rgba(34,211,238,.6); animation: cert-pulse 2.4s ease-out infinite; flex-shrink: 0; display: inline-block; margin-right: .45rem; vertical-align: middle; }
+  .cert-chip .cert-dot { margin-right: 0; }
+  @keyframes cert-pulse { 0% { box-shadow: 0 0 0 0 rgba(34,211,238,.55); } 70%, 100% { box-shadow: 0 0 0 9px rgba(34,211,238,0); } }
+  .cert-band { display: grid; grid-template-columns: auto minmax(0, 1.6fr) minmax(0, 1fr); gap: 2.5rem; align-items: center; margin: 4.5rem 0 0; padding: 2.25rem; border-radius: 4px; background: linear-gradient(120deg, var(--indigo-deep) 0%, #3730a3 55%, #0e7490 100%); color: #fff; }
+  .cert-seal { color: #fff; }
+  .cert-seal svg { display: block; animation: cert-spin 40s linear infinite; }
+  .cert-seal svg g { transform-origin: 60px 60px; }
+  @keyframes cert-spin { to { transform: rotate(360deg); } }
+  .cert-text .mono { color: #c7d2fe; }
+  .cert-text h2 { margin: .5rem 0 .75rem; font-weight: 400; letter-spacing: -0.02em; font-size: clamp(1.7rem, 3.5vw, 2.6rem); }
+  .cert-text p:not(.mono) { color: #e0e7ff; max-width: 60ch; }
+  .cert-text a { color: #fff; }
+  .cert-meta dl { display: grid; gap: .75rem; margin-bottom: 1.25rem; }
+  .cert-meta dt { color: #c7d2fe; font-size: .62rem; }
+  .cert-meta dd { margin: 0; font-size: 1.05rem; }
+  .cert-meta .btn-primary { background: #fff; color: #1e1b4b; }
+  .cert-meta .btn-primary:hover { background: var(--color-accent); color: #07070c; }
+
+  /* Stack */
+  .stack-grid { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+  .stack-tile { position: relative; padding: 1.75rem 1.5rem 2rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); transition: background .3s ease; }
+  .stack-tile:hover { background: var(--color-surface); }
+  .stack-tile::after { content: ''; position: absolute; left: 0; top: 0; height: 3px; width: 0; background: linear-gradient(90deg, var(--color-primary), var(--color-accent)); transition: width .5s ease; }
+  .stack-tile:hover::after, .stack-hl::after { width: 100%; }
+  .stack-idx { display: block; margin-bottom: 2.5rem; }
+  .stack-tile h3 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 400; letter-spacing: -0.02em; }
+  .stack-role { color: var(--color-accent); margin: .35rem 0 .9rem; }
+  .stack-tile p:last-child { color: var(--color-text-muted); font-size: .93rem; }
+
+  /* Heatmap */
+  .heat { position: relative; margin: 0; }
+  .heat-peak { color: var(--color-text); margin-bottom: .75rem; }
+  .heat-scroll { overflow-x: auto; padding-bottom: .5rem; }
+  .heat-grid { display: grid; grid-template-columns: 6.5rem repeat(var(--cols), minmax(22px, 40px)); gap: 5px; min-width: 620px; }
+  .heat-stage { font-size: .6rem; white-space: nowrap; overflow: visible; color: var(--color-text); }
+  .heat-stage.is-first { border-left: 1px solid var(--color-primary-hover); padding-left: 4px; }
+  .heat-row { font-size: .6rem; align-self: center; white-space: nowrap; }
+  .heat-cell { aspect-ratio: 1; border-radius: 2px; }
+  .q-0 { background: #1a1a29; } .q-1 { background: #34346e; } .q-2 { background: var(--color-primary); }
+  .q-3 { background: #a5b4fc; } .q-4 { background: var(--color-accent); }
+  .heat-cell.is-peak { outline: 2px solid #fff; outline-offset: 2px; }
+  :global(.js) .heat .heat-cell:not(.q-0) { opacity: 0; transform: scale(.4); transition: opacity .4s ease, transform .4s ease; transition-delay: var(--d); }
+  :global(.js) .heat.in .heat-cell:not(.q-0) { opacity: 1; transform: none; }
+  .heat-cell:not(.q-0):hover { filter: brightness(1.3); }
+  .heat-col { font-size: .62rem; text-align: center; color: var(--color-text-muted); text-decoration: none; padding-top: .25rem; border-top: 1px solid var(--line); }
+  .heat-col:hover, .heat-col.is-peak { color: var(--color-accent); }
+  .heat-legend { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; margin-top: 1.25rem; }
+  .legend-scale { display: inline-flex; gap: 3px; }
+  .legend-scale i { width: 12px; height: 12px; border-radius: 2px; }
+  .legend-sep { color: var(--color-text-muted); }
+  .stage-list { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1.5rem 2rem; margin-top: 3rem; }
+  .stage-list li { display: grid; grid-template-columns: auto auto 1fr; gap: .25rem .6rem; align-items: center; }
+  .stage-dot { width: 10px; height: 10px; border-radius: 2px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); }
+  .stage-list strong { font-size: .95rem; }
+  .stage-desc { grid-column: 1 / -1; color: var(--color-text-muted); font-size: .85rem; }
+
+  /* Principles */
+  .pr-grid { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+  .pr { position: relative; min-height: 300px; padding: 1.5rem; border-radius: 4px; display: flex; flex-direction: column; justify-content: end; overflow: hidden; }
+  .pr-num { position: absolute; top: .5rem; right: 1rem; font-size: 6.5rem; font-weight: 200; line-height: 1; opacity: .9; }
+  .pr h3 { font-size: 1.2rem; margin-bottom: .6rem; position: relative; }
+  .pr p { font-size: .9rem; position: relative; }
+  .pr-0 { background: var(--indigo-deep); color: #fff; }
+  .pr-1 { background: var(--color-surface); border: 1px solid var(--line); }
+  .pr-1 .pr-num { color: var(--color-primary-hover); }
+  .pr-1 p, .pr-3 p { color: var(--color-text-muted); }
+  .pr-2 { background: var(--color-accent); color: #07070c; }
+  .pr-3 { border: 1px solid var(--color-accent); }
+  .pr-3 .pr-num { color: var(--color-accent); }
+
+  /* Services */
+  .sv-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border-top: 1px solid var(--line); }
+  .sv { padding: 2rem 1.75rem 2.25rem 0; display: flex; flex-direction: column; gap: .75rem; }
+  .sv + .sv { padding-left: 1.75rem; border-left: 1px solid var(--line); }
+  .sv-tag { color: var(--color-accent); }
+  .sv h3 { font-size: 1.5rem; font-weight: 400; }
+  .sv p:not(.mono) { color: var(--color-text-muted); flex: 1; }
+  .sv-link { color: var(--color-text); text-decoration: none; border-bottom: 1px solid var(--color-primary-hover); align-self: start; padding-bottom: .2rem; }
+  .sv-link:hover { color: var(--color-accent); border-color: var(--color-accent); }
+
+  /* FAQ */
+  .faq details { border-top: 1px solid var(--line); padding: 1.1rem 0; }
+  .faq details:last-child { border-bottom: 1px solid var(--line); }
+  .faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; font-family: var(--mono); color: var(--color-accent); font-size: 1.3rem; transition: transform .25s ease; }
+  .faq details[open] summary::after { transform: rotate(45deg); }
+  .faq h3 { font-size: 1.1rem; font-weight: 600; }
+  .faq details p { margin: .75rem 0 0; }
+
+  /* CTA */
+  .lg-cta { margin-top: 4rem; padding: clamp(2rem, 5vw, 4rem); border-radius: 4px; background: radial-gradient(120% 140% at 0% 0%, #2a2a6e 0%, transparent 60%), radial-gradient(120% 140% at 100% 100%, #0b4250 0%, transparent 55%), var(--color-surface); border: 1px solid var(--line); }
+  .lg-cta h2 { font-size: clamp(1.9rem, 4.5vw, 3.2rem); font-weight: 400; letter-spacing: -0.02em; margin: 1rem 0; max-width: 18ch; }
+  .lg-cta p:not(.mono) { color: var(--color-text-muted); max-width: 60ch; margin-bottom: 1.75rem; }
+
+  /* Chapter rail */
+  .lg-rail { position: fixed; left: 50%; bottom: 14px; transform: translate(-50%, 140%); z-index: 90; display: none; align-items: center; gap: .9rem; padding: .55rem .9rem; background: rgba(19,19,32,.94); border: 1px solid var(--line); border-radius: 4px; color: var(--color-text); font-size: .66rem; transition: transform .35s ease; white-space: nowrap; }
+  :global(.js) .lg-rail { display: flex; }
+  .lg-rail.on { transform: translate(-50%, 0); }
+  .lg-rail-bar { width: 90px; height: 3px; background: var(--line); position: relative; overflow: hidden; }
+  .lg-rail-bar i { position: absolute; inset: 0; transform-origin: left; transform: scaleX(var(--p, 0)); background: linear-gradient(90deg, var(--color-primary), var(--color-accent)); }
+
+  @media (max-width: 1000px) {
+    .cert-band { grid-template-columns: auto minmax(0, 1fr); }
+    .cert-meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+    .cert-meta dl { grid-auto-flow: column; gap: 2rem; margin: 0; }
+    .lg-hero { grid-template-columns: 1fr; }
+    .lg-ghost { left: -2%; top: 22%; }
+    .pr-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .stage-list { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  }
+  @media (max-width: 760px) {
+    .lg { padding-inline: 1rem; }
+    .lg-row, .lg-head { grid-template-columns: 1fr; gap: 1rem; }
+    .lg-side { position: static; }
+    .lg-row, .lg-section { padding: 3rem 0; }
+    .stack-grid, .sv-grid { grid-template-columns: 1fr; }
+    .sv, .sv + .sv { padding: 1.75rem 0; border-left: 0; border-bottom: 1px solid var(--line); }
+    .stage-list { grid-template-columns: 1fr; }
+    .kpi-cyan, .kpi-outline, .kpi-soft, .kpi-dark { grid-column: span 3; }
+    .lg-kicker span:last-child { display: none; }
+  }
+  @media (max-width: 600px) {
+    .cert-band { grid-template-columns: 1fr; padding: 1.5rem; gap: 1.25rem; margin-top: 3rem; }
+    .cert-seal svg { width: 84px; height: 84px; }
+  }
+  @media (max-width: 480px) {
+    .pr-grid { grid-template-columns: 1fr; }
+    .pr { min-height: 220px; }
+    .kpi { padding: .85rem; }
+    .kpi-label { flex-direction: column; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .rv, :global(.js) .heat .heat-cell:not(.q-0) { opacity: 1; transform: none; transition: none; }
+    .lg-rail, a.kpi, .stack-tile::after { transition: none; }
+    .cert-dot, .cert-seal svg { animation: none; }
+  }
+</style>
