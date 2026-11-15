@@ -1,10 +1,13 @@
 ---
+import { graph, organization, website } from '../lib/seo';
+
 export interface Props {
   title?: string;
   description?: string;
   ogType?: 'website' | 'profile' | 'article';
+  noindex?: boolean;
 }
-const { title, ogType = 'website', description = 'Un corso gratuito in italiano per collegare dati, analisi e decisioni. Esplora il programma GinnyTech e scegli il tuo percorso.' } = Astro.props;
+const { title, ogType = 'website', noindex = false, description = 'Un corso gratuito in italiano per collegare dati, analisi e decisioni. Esplora il programma GinnyTech e scegli il tuo percorso.' } = Astro.props;
 const pageTitle = title ? `${title} — GinnyTech` : 'GinnyTech — Corso gratuito di Analytics e Data Engineering';
 const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://ginnytech.it').toString();
 const socialImage = new URL('/social-card.png', Astro.site || 'https://ginnytech.it').toString();
@@ -26,7 +29,12 @@ const navigation = [
   <meta name="description" content={description} />
   <title>{pageTitle}</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="canonical" href={canonicalURL} />
+  <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1'} />
+  <meta name="author" content="Andrii Dyshkantiuk" />
+  <meta name="theme-color" content="#0a0a0f" />
+  {!noindex && <link rel="canonical" href={canonicalURL} />}
+  <link rel="alternate" type="text/plain" title="GinnyTech per agenti AI (llms.txt)" href="/llms.txt" />
+  <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
   <meta property="og:title" content={pageTitle} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content={ogType} />
@@ -43,6 +51,7 @@ const navigation = [
   <meta name="twitter:image" content={socialImage} />
   <meta name="twitter:image:alt" content="GinnyTech: corso gratuito in italiano su analytics, marketing e data engineering." />
   <link rel="stylesheet" href="/styles/global.css" />
+  <script type="application/ld+json" set:html={graph(organization, website)} />
   <slot name="head" />
   <script is:inline>document.documentElement.classList.add('js');</script>
 </head>

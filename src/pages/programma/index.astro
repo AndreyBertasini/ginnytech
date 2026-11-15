@@ -2,10 +2,36 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ModuleCard from '../../components/ModuleCard.astro';
 import LearningPaths from '../../components/LearningPaths.astro';
-import { modules, stages } from '../../data/course';
+import { modules, stages, learningPaths } from '../../data/course';
+import { absolute, breadcrumb, COURSE_URL, graph, modulePath, ORG_ID, PERSON_ID } from '../../lib/seo';
+
+const jsonLd = graph(
+  {
+    '@type': 'Course',
+    '@id': `${COURSE_URL}#course`,
+    url: COURSE_URL,
+    name: 'GinnyTech: corso gratuito di analytics e data engineering',
+    description: `Programma gratuito in italiano di ${modules.length} moduli in ${stages.length} tappe e ${learningPaths.length} percorsi: metriche, SQL, modellazione dei dati, marketing analytics, A/B test, previsioni e data engineering.`,
+    inLanguage: 'it',
+    isAccessibleForFree: true,
+    provider: { '@id': ORG_ID },
+    creator: { '@id': PERSON_ID },
+    offers: { '@type': 'Offer', category: 'Free', price: 0, priceCurrency: 'EUR', availability: 'https://schema.org/InStock' },
+    hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'Online', inLanguage: 'it' },
+    hasPart: modules.map(m => ({ '@id': `${absolute(modulePath(m))}#course` })),
+  },
+  {
+    '@type': 'ItemList',
+    name: 'Moduli del corso GinnyTech',
+    numberOfItems: modules.length,
+    itemListElement: modules.map((m, i) => ({ '@type': 'ListItem', position: i + 1, url: absolute(modulePath(m)), name: m.title })),
+  },
+  breadcrumb([{ name: 'Programma', path: '/programma/' }]),
+);
 ---
 
 <BaseLayout title="Programma e percorsi di studio" description="Esplora i 19 moduli del corso gratuito GinnyTech: obiettivi, prerequisiti e percorsi consigliati per analytics, marketing e data engineering.">
+  <script slot="head" type="application/ld+json" set:html={jsonLd} />
   <section class="page-hero">
     <p class="eyebrow">Corso gratuito · {modules.length} moduli</p>
     <h1>Scegli da dove iniziare</h1>

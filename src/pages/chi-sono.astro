@@ -84,7 +84,7 @@ const chapters = ['Chi sono', 'I numeri', 'Lo stack', 'La mappa', 'Come lavoro',
 const total = String(chapters.length).padStart(2, '0');
 const ch = (i: number) => `${String(i + 1).padStart(2, '0')} / ${total}`;
 
-const description = `Andrii Dyshkantiuk, data engineering e analytics, ClickHouse Certified Developer: SQL, dbt, Python e modelli previsionali per decisioni migliori. Creatore del corso gratuito GinnyTech.`;
+const description = `Andrii Dyshkantiuk: data engineer e analytics consultant, ClickHouse Certified Developer. SQL, dbt, Python e modelli previsionali. Creatore di GinnyTech.`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -116,14 +116,7 @@ const jsonLd = {
         url: `${site}${certification.pdf}`,
         recognizedBy: { '@type': 'Organization', name: certification.issuer, url: certification.issuerUrl },
       },
-      founder: { '@id': `${site}/#organization` },
-    },
-    {
-      '@type': 'Organization',
-      '@id': `${site}/#organization`,
-      name: 'GinnyTech',
-      url: `${site}/`,
-      founder: { '@id': `${pageUrl}#person` },
+      worksFor: { '@id': `${site}/#organization` },
     },
     {
       '@type': 'BreadcrumbList',
@@ -142,7 +135,7 @@ const jsonLd = {
 };
 ---
 
-<BaseLayout title="Chi sono — Andrii Dyshkantiuk, data engineering e analytics" {description} ogType="profile">
+<BaseLayout title="Andrii Dyshkantiuk, data engineer e analytics" {description} ogType="profile">
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
   <div class="lg">

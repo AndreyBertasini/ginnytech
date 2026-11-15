@@ -120,7 +120,7 @@ test('articles clearly distinguish previews and the site makes no external font 
 test('profile page exposes structured data, the course map and no private details', async ({ page }) => {
   await page.goto('/chi-sono/');
   await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'profile');
-  const graph = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent() ?? '{}')['@graph'];
+  const graph = (await page.locator('script[type="application/ld+json"]').allTextContents()).flatMap(text => JSON.parse(text)['@graph']);
   const types = graph.map((node: { '@type': string }) => node['@type']);
   expect(types).toEqual(expect.arrayContaining(['ProfilePage', 'Person', 'BreadcrumbList', 'FAQPage']));
   await expect(page.locator('.heat-col')).toHaveCount(19);
@@ -130,4 +130,42 @@ test('profile page exposes structured data, the course map and no private detail
   expect(certificate.status()).toBe(200);
   expect(certificate.headers()['content-type']).toContain('pdf');
   await expect(page.locator('body')).not.toContainText(/SNAI|Flutter|Verona|Milano/);
+});
+
+test('search engines and AI agents get valid structured data, robots and llms.txt', async ({ page, request }) => {
+  const routes = ['/', '/programma/', '/programma/modulo-12/', '/glossario/', '/chi-sono/', '/informazioni/', '/articoli/', '/cerca/', '/prenota-call/', '/privacy/'];
+  for (const route of routes) {
+    await page.goto(route);
+    const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+    expect(blocks.length, route).toBeGreaterThan(0);
+    const types = blocks.flatMap(text => JSON.parse(text)['@graph'].map((node: { '@type': string }) => node['@type']));
+    expect(types, route).toEqual(expect.arrayContaining(['EducationalOrganization', 'WebSite']));
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /^index, follow/);
+    const description = await page.locator('meta[name="description"]').getAttribute('content');
+    expect(description!.length, route).toBeLessThanOrEqual(160);
+  }
+
+  await page.goto('/programma/modulo-12/');
+  const moduleTypes = (await page.locator('script[type="application/ld+json"]').allTextContents()).flatMap(text => JSON.parse(text)['@graph']);
+  const course = moduleTypes.find((node: { '@type': string }) => node['@type'] === 'Course');
+  expect(course).toMatchObject({ isAccessibleForFree: true, inLanguage: 'it', offers: { price: 0, priceCurrency: 'EUR' } });
+
+  const robots = await (await request.get('/robots.txt')).text();
+  expect(robots).toContain('Sitemap: https://ginnytech.it/sitemap-index.xml');
+  for (const agent of ['GPTBot', 'ClaudeBot', 'PerplexityBot', 'Google-Extended']) expect(robots).toContain(`User-agent: ${agent}\nAllow: /`);
+  expect(robots).not.toMatch(/Disallow: \/\S/);
+
+  const llms = await (await request.get('/llms.txt')).text();
+  expect(llms.startsWith('# GinnyTech\n\n> ')).toBe(true);
+  expect(llms.match(/\/programma\/modulo-\d+\//g)?.length).toBe(19);
+  const full = await (await request.get('/llms-full.txt')).text();
+  expect(full).toContain('## Modulo 19:');
+  expect(full).toContain('# Glossario');
+});
+
+test('missing pages return a noindex 404', async ({ page }) => {
+  const response = await page.goto('/pagina-inesistente/');
+  expect(response?.status()).toBe(404);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
 });

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { modules, stages, type CourseModule } from '../../data/course';
+import { breadcrumb, courseNode, graph, modulePath } from '../../lib/seo';
 
 export function getStaticPaths() {
   return modules.map(module => ({ params: { slug: module.slug }, props: { module } }));
@@ -12,9 +13,15 @@ const stage = stages.find(s => s.moduleIds.includes(module.id))!;
 const position = stage.moduleIds.indexOf(module.id);
 const next = modules.find(m => m.id === stage.moduleIds[position + 1]);
 const prerequisites = module.prerequisiteIds.map(id => modules.find(m => m.id === id)!);
+const description = `${module.summary} Modulo ${module.id} del corso gratuito GinnyTech.`;
+const jsonLd = graph(
+  courseNode(module, prerequisites),
+  breadcrumb([{ name: 'Programma', path: '/programma/' }, { name: stage.title, path: `/programma/#${stage.id}` }, { name: module.title, path: modulePath(module) }]),
+);
 ---
 
-<BaseLayout title={module.title} description={module.summary}>
+<BaseLayout title={module.title} {description}>
+  <script slot="head" type="application/ld+json" set:html={jsonLd} />
   <section class="page-hero">
     <p class="eyebrow">Modulo {module.id} · {stage.title}</p>
     <h1>{module.title}</h1>
